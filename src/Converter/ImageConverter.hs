@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
-module RawRGB (convertJpgDirToBMP, convertJpgToBMP, convertBmpDirToTxt, removeWithExtentionAt) where
+module RawRGB where
 
 import qualified Data.ByteString.UTF8  as BSU8 (toString, fromString)
 import qualified Data.ByteString       as BS   (readFile, ByteString(..), pack, writeFile, concat)
@@ -57,35 +57,9 @@ bmpToRaw dir fp = do
         let imgrgba8 = fromDynamicImage dynimg
             name     = takeBaseName fp
             pixels   = encodePixels imgrgba8
---            huffman  = toHuffmanFormat pixels
         writeFile (dir </> name ++ ".txt") (concat pixels)
 
-
---toHuffmanFormat :: [((String, String, String), Int, Int)] -> String
---toHuffmanFormat [] = []
---toHuffmanFormat l  = concat (rgbF c : go c (s:sorted))
---  where (s@(c,_,_):sorted) = sortBy (\(x,_,_) (y,_,_) -> compare x y) l
---        go :: (String, String, String) -> [((String, String, String), Int, Int)] -> [String]
---        go old [] = []
---        go old ((rgb,x,y):ys)
---          | old == rgb = (xyF x y) : go old ys
---          | otherwise  =  ('\n' : rgbF rgb) : (xyF x y) : (go rgb ys)
-
-
---rgbF :: (String, String, String) -> String
---rgbF (r,g,b) = ('[' : r) ++ ('$' : g) ++ ('$' : b) ++ "]&\n"
-
---xyF :: Int -> Int -> String
---xyF x y = ('#' : (show x)) ++ ('$' : (show y)) ++ "*"
-
--- | uses the PixelRGBA8 Format to get every pixel with (R)ed, (G)reen and (B)lue values
---   with their corresponding X and Y coordinates
---
---   The formatting is to be used by the Arduino Wifi Shield...
-
---encodePixels :: Image PixelRGBA8 -> [((String, String, String), Int, Int)]
 encodePixels img@(Image w h _) = [ format (pixelAt img x y) x y | x <- [0..(w-1)], y <- [0..(h-1)]]
-  --where format (PixelRGBA8 r g b _) j k = ((show r, show g, show b), j, k)
 
   where format (PixelRGBA8 r g b _) j k = "#" ++ show r ++ "$"
                                               ++ show g ++ "$"
@@ -174,6 +148,3 @@ fromDynamicImage (ImageRGB8 img) = pixelMap toRGBA8 img
 fromDynamicImage (ImageRGBA8 img) = img
 
 -- end of Codec.Picture.RGBA8
-
-
-
