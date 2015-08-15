@@ -4,15 +4,15 @@ This is my take on an offline converter from `.jpg` to `.c` or `.raw` format and
 
 I will try to make the offline tool as identical as possible to the corresponding tool at [RinkyDink](http://www.rinkydinkelectronics.com/library.php?id=51).
 
-#### Currently working:
+#### In testing:
 
-  * converting .jpg to .c (not tested enough to say it works for everything)
+  * converting `.jpg` to `.c`
 
 #### TODO:
 
-  * convert from .jpg to .raw
-  * convert .bmp to .raw + .c
-  * convert .png to .raw + .c
+  * convert from `.jpg` to `.raw`
+  * convert `.bmp` to `.raw` + `.c`
+  * convert `.png` to `.raw` + `.c`
   * test basic functionality with the Snap server (maybe create a testing environment)
 
 
