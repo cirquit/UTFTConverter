@@ -27,7 +27,7 @@ to4Hex :: Int -> String
 to4Hex x = go hx
   where hx = toHex x
         go :: String -> String
-        go str
+        go !str
           | length str < 4 = go ('0':str)
           | otherwise      = str
 
@@ -49,4 +49,4 @@ hex 12 = 'C'
 hex 13 = 'D'
 hex 14 = 'E'
 hex 15 = 'F'
-hex x  = error $ "This was unexpected in 'hex' - " ++ show x
+hex x  = error $ "Exceeded bounds of 'hex' - " ++ show x
