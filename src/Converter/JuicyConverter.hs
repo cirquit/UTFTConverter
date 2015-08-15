@@ -1,6 +1,6 @@
 module Main where
 
-import Converter (jpgToC)
+import Converter (jpgToC, jpgToRaw)
 
 import System.FilePath.Posix (takeBaseName, takeExtension, takeDirectory, (</>))
 import System.Directory      (doesDirectoryExist, getCurrentDirectory,
@@ -15,7 +15,10 @@ main = do
       savepath <- getSavePath spath
       files    <- getFiles    fpath
       mapM_ (jpgToC savepath) files
-    (fpath:"/r":spath) -> error "Not implemented yet"
+    (fpath:"/r":spath) -> do
+      savepath <- getSavePath spath
+      files    <- getFiles    fpath
+      mapM_ (jpgToRaw savepath) files
     (_) -> getProgName >>= help
 
 getFiles :: FilePath -> IO [FilePath]

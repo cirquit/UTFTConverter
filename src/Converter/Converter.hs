@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeSynonymInstances #-}
-module Converter (jpgToC) where
+module Converter (jpgToC, jpgToRaw) where
 
 import qualified Data.ByteString as BS (readFile)
 import Data.ByteString.Lazy            (toStrict)
@@ -30,9 +30,35 @@ jpgToC saveTo fp = do
           putStrLn $ "Converted " ++ name ++ ".c"
 
 
+jpgToRaw :: FilePath -> FilePath -> IO ()
+jpgToRaw saveTo fp = do
+  bs  <- BS.readFile fp
+  case decodeJpeg bs of
+    Left err     -> putStrLn $ "Error happend while decoding the jpg: " ++ err
+    Right dynimg ->
+      case decodeBitmap (toStrict (imageToBitmap dynimg)) of
+        Left err'     -> putStrLn $ "Error happend while decoding the bmp " ++ err'
+        Right dynimg' -> do
+          time <- getCurrentTime
+          let img  = fromDynamicImage dynimg'
+              name = takeBaseName fp
+              content = toRawFile (encodePixels img)
+          writeFile (saveTo </> name ++ ".raw") content
+          putStrLn $ "Converted " ++ name ++ ".raw"
+
 encodePixels :: Image PixelRGBA8 -> [String]
 encodePixels img@(Image w h _) = [ format (pixelAt img y x) | x <- [0..(h-1)], y <- [0..(w-1)]]
   where format (PixelRGBA8 r g b _) = toRGB565Hex (r, g, b)
+
+
+toRawFile :: [String] -> String
+toRawFile l = toRawArray l 1
+  where toRawArray :: [String] -> Int -> String
+        toRawArray []     _ = []
+        toRawArray (x:xs) n = x ++ ' ' : nl ++ toRawArray xs (n + 1)
+           where nl
+                  | n `mod` 16 == 0 = "\n"
+                  | otherwise       = []
 
 
 toCFile :: [String] -> String -> (Int, Int) -> UTCTime -> String
