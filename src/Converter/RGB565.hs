@@ -1,28 +1,36 @@
 {-# LANGUAGE BangPatterns #-}
-module RGB565 (toRGB565, toRGB565Hex, toHex) where
+module RGB565 (toRGB565, toRGB565Hex, to4Hex, toHex) where
 
 import Data.Bits (shiftL, shiftR, (.|.))
+import Data.Word (Word8())
 
-type Red   = Int
-type Green = Int
-type Blue  = Int
+toRGB565Hex :: (Word8, Word8, Word8) -> String
+toRGB565Hex rgb = to4Hex (toRGB565 rgb)
 
-toRGB565Hex :: (Red, Blue, Green) -> String
-toRGB565Hex rgb = toHex (toRGB565 rgb)
-
-toRGB565 :: (Red, Blue, Green) -> Int
+toRGB565 :: (Word8, Word8, Word8) -> Int
 toRGB565 (r, g, b) = r' .|. g' .|. b'
-  where r'  = (r `shiftR` 3) `shiftL` 11
-        g'  = (g `shiftR` 2) `shiftL` 5
-        b'  =  b `shiftR` 3
+  where r'  = ((toInt r) `shiftR` 3) `shiftL` 11
+        g'  = ((toInt g) `shiftR` 2) `shiftL` 5
+        b'  =  (toInt b) `shiftR` 3
+
+toInt :: Word8 -> Int
+toInt = fromIntegral
 
 toHex :: Int -> String
 toHex x = go x ""
   where go x !acc =
           case quotRem x 16 of
-            (q,0) ->       hex q : acc
             (0,r) ->       hex r : acc
             (q,r) -> go q (hex r : acc)
+
+to4Hex :: Int -> String
+to4Hex x = go hx
+  where hx = toHex x
+        go :: String -> String
+        go str
+          | length str < 4 = go ('0':str)
+          | otherwise      = str
+
 
 hex :: Int -> Char
 hex 0  = '0'
@@ -41,3 +49,4 @@ hex 12 = 'C'
 hex 13 = 'D'
 hex 14 = 'E'
 hex 15 = 'F'
+hex x  = error $ "This was unexpected in 'hex' - " ++ show x
