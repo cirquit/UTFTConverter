@@ -4,14 +4,14 @@ module Converter (pictureToRaw, pictureToC) where
 import qualified Data.ByteString as BS (readFile)
 import Data.ByteString.Lazy            (toStrict)
 import System.FilePath.Posix           (takeBaseName, (</>), takeExtension)
-import Data.Time                       (getCurrentTime, UTCTime())
+import Data.Time                       (getCurrentTime)
 
 import Codec.Picture.Types
 import Codec.Picture.Saving (imageToBitmap)
 import Codec.Picture.Jpg    (decodeJpeg)
 import Codec.Picture.Bitmap (decodeBitmap)
 
-import RGB565               (toRGB565Hex, to4Hex)
+import RGB565               (toRGB565Hex)
 import C                    (toCFile)
 import Raw                  (toRawFile)
 
@@ -19,17 +19,16 @@ import Raw                  (toRawFile)
 pictureToRaw :: FilePath -> FilePath -> IO ()
 pictureToRaw saveTo fp = do
   case takeExtension fp of
-    (".jpg") -> jpgToDynImg fp >>= dynimgtoRaw saveTo fp
-    (".bmp") -> bmpToDynImg fp >>= dynimgtoRaw saveTo fp
-    (_)      -> error "Argument filter let through some unsupportet types"
+    (".jpg") -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
+    (".bmp") -> bmpToDynImg fp >>= dynimgToRaw saveTo fp
+    (_)      -> error "Argument filter let through some unsupported types"
 
 pictureToC :: FilePath -> FilePath -> IO ()
 pictureToC saveTo fp = do
   case takeExtension fp of
-    (".jpg") -> jpgToDynImg fp >>= dynimgtoC saveTo fp
-    (".bmp") -> bmpToDynImg fp >>= dynimgtoC saveTo fp
-    (_)      -> error "Argument filter let through some unsupportet types"
-
+    (".jpg") -> jpgToDynImg fp >>= dynimgToC saveTo fp
+    (".bmp") -> bmpToDynImg fp >>= dynimgToC saveTo fp
+    (_)      -> error "Argument filter let through some unsupported types"
 
 jpgToDynImg :: FilePath -> IO (Maybe DynamicImage)
 jpgToDynImg fp = do
@@ -38,9 +37,8 @@ jpgToDynImg fp = do
     Left err     -> putStrLn ("Error happend while decoding the jpg: " ++ err) >> return Nothing
     Right dynimg ->
       case decodeBitmap (toStrict (imageToBitmap dynimg)) of
-        Left err'     -> putStrLn ("Error happend while decoding the bmp: " ++ err') >> return Nothing
+        Left err'     -> putStrLn ("Error happend while decoding the converted bmp: " ++ err') >> return Nothing
         Right dynimg' -> return $ Just dynimg'
-
 
 bmpToDynImg :: FilePath -> IO (Maybe DynamicImage)
 bmpToDynImg fp = do
@@ -49,20 +47,17 @@ bmpToDynImg fp = do
     Left err     -> putStrLn ("Error happend while decoding the bmp: " ++ err) >> return Nothing
     Right dynimg -> return $ Just dynimg
 
-
-
-dynimgtoRaw :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
-dynimgtoRaw      _  _      Nothing  = return ()
-dynimgtoRaw saveTo fp (Just dynimg) = do
-  time <- getCurrentTime
+dynimgToRaw :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
+dynimgToRaw      _  _      Nothing  = return ()
+dynimgToRaw saveTo fp (Just dynimg) = do
   let img  = fromDynamicImage dynimg
       name = takeBaseName fp
       content = toRawFile (encodePixels img)
   writeFile (saveTo </> name ++ ".raw") content
   putStrLn $ "Converted " ++ name ++ ".raw"
 
-dynimgtoC :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
-dynimgtoC _       _      Nothing  = putStrLn "Something happened..."
+dynimgToC :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
+dynimgToC _       _      Nothing  = return ()
 dynimgToC saveTo fp (Just dynimg) = do
   time <- getCurrentTime
   let img@(Image w h _) = fromDynamicImage dynimg
@@ -70,12 +65,6 @@ dynimgToC saveTo fp (Just dynimg) = do
       content           = toCFile (encodePixels img) name (w, h) time
   writeFile (saveTo </> name ++ ".c") content
   putStrLn $ "Converted " ++ name ++ ".c"
-
-
-
-
-
-
 
 encodePixels :: Image PixelRGBA8 -> [String]
 encodePixels img@(Image w h _) = [ format (pixelAt img y x) | x <- [0..(h-1)], y <- [0..(w-1)]]
@@ -104,5 +93,6 @@ fromDynamicImage (ImageY8 img)    = pixelMap toRGBA8 img
 fromDynamicImage (ImageYA8 img)   = pixelMap toRGBA8 img
 fromDynamicImage (ImageRGB8 img)  = pixelMap toRGBA8 img
 fromDynamicImage (ImageRGBA8 img) = img
+fromDynamicImage _                = error "fromDynamicImage in Converter got an image type it doesn't know..."
 
 ---- end of Codec.Picture.RGBA8

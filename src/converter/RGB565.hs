@@ -17,11 +17,11 @@ toInt :: Word8 -> Int
 toInt = fromIntegral
 
 toHex :: Int -> String
-toHex x = go x ""
-  where go x !acc =
+toHex = go ""
+  where go !acc x =
           case quotRem x 16 of
-            (0,r) ->       hex r : acc
-            (q,r) -> go q (hex r : acc)
+            (0,r) ->     hex r : acc
+            (q,r) -> go (hex r : acc) q
 
 to4Hex :: Int -> String
 to4Hex x = go hx
