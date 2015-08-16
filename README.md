@@ -15,7 +15,7 @@ I will try to make the offline tool as identical as possible to the correspondin
   * convert `.bmp` to `.raw` + `.c`
   * convert `.png` to `.raw` + `.c`
   * test basic functionality with the Snap server (maybe create a testing environment)
-
+  * learn about cabal packaging and how to deploy a simple project
 
 ##### About:
 
