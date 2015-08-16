@@ -20,18 +20,20 @@ pictureToRaw :: FilePath -> FilePath -> IO ()
 pictureToRaw saveTo fp = do
   case takeExtension fp of
     (".jpg") -> jpgToDynImg fp >>= dynimgtoRaw saveTo fp
+    (".bmp") -> bmpToDynImg fp >>= dynimgtoRaw saveTo fp
     (_)      -> error "Argument filter let through some unsupportet types"
 
 pictureToC :: FilePath -> FilePath -> IO ()
 pictureToC saveTo fp = do
   case takeExtension fp of
     (".jpg") -> jpgToDynImg fp >>= dynimgtoC saveTo fp
+    (".bmp") -> bmpToDynImg fp >>= dynimgtoC saveTo fp
     (_)      -> error "Argument filter let through some unsupportet types"
 
 
 jpgToDynImg :: FilePath -> IO (Maybe DynamicImage)
 jpgToDynImg fp = do
-  bs  <- BS.readFile fp
+  bs <- BS.readFile fp
   case decodeJpeg bs of
     Left err     -> putStrLn ("Error happend while decoding the jpg: " ++ err) >> return Nothing
     Right dynimg ->
@@ -40,13 +42,18 @@ jpgToDynImg fp = do
         Right dynimg' -> return $ Just dynimg'
 
 
-
+bmpToDynImg :: FilePath -> IO (Maybe DynamicImage)
+bmpToDynImg fp = do
+  bs <- BS.readFile fp
+  case decodeBitmap bs of
+    Left err     -> putStrLn ("Error happend while decoding the bmp: " ++ err) >> return Nothing
+    Right dynimg -> return $ Just dynimg
 
 
 
 dynimgtoRaw :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
-dynimgtoRaw saveTo fp      Nothing = return ()
-dynimgtoRaw saveTo fp (Just dynimg)= do
+dynimgtoRaw      _  _      Nothing  = return ()
+dynimgtoRaw saveTo fp (Just dynimg) = do
   time <- getCurrentTime
   let img  = fromDynamicImage dynimg
       name = takeBaseName fp
@@ -55,12 +62,12 @@ dynimgtoRaw saveTo fp (Just dynimg)= do
   putStrLn $ "Converted " ++ name ++ ".raw"
 
 dynimgtoC :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
-dynimgtoC saveTo fp      Nothing  = return ()
+dynimgtoC _       _      Nothing  = putStrLn "Something happened..."
 dynimgToC saveTo fp (Just dynimg) = do
   time <- getCurrentTime
-  let img@(Image w h _)  = fromDynamicImage dynimg
-      name               = takeBaseName fp
-      content            = toCFile (encodePixels img) name (w, h) time
+  let img@(Image w h _) = fromDynamicImage dynimg
+      name              = takeBaseName fp
+      content           = toCFile (encodePixels img) name (w, h) time
   writeFile (saveTo </> name ++ ".c") content
   putStrLn $ "Converted " ++ name ++ ".c"
 

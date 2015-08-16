@@ -11,18 +11,15 @@ type Args = [String]
 main :: IO()
 main = do
   args <- getArgs
-  print args
   case args of
     (_)
       | "/c" `elem` args, "/r" `notElem` args -> do
         files    <- args `getFilesFor` "/c"
         savepath <- getSavePath args
-        putStrLn $ "Got this savepath in /c: " ++ show savepath
         mapM_ (pictureToC savepath) files
       | "/r" `elem` args, "/c" `notElem` args -> do
         files    <- args `getFilesFor` "/r"
         savepath <- getSavePath args
-        putStrLn $ "Got this savepath in /r: " ++ show savepath
         mapM_ (pictureToRaw savepath) files
     (_) -> getProgName >>= help
 
