@@ -4,7 +4,7 @@ import System.FilePath.Posix (takeExtension)
 import System.Directory      (getCurrentDirectory, createDirectoryIfMissing)
 import System.Environment    (getArgs, getProgName)
 
-import Converter (pictureToC, pictureToRaw)
+import Converter             (pictureToC, pictureToRaw)
 
 type Args = [String]
 
@@ -31,6 +31,7 @@ getFilesFor l delim = go (takeWhile (delim /=) l)
           case takeExtension fp of
             (".jpg") -> go xs >>= \x -> return (fp : x)
             (".bmp") -> go xs >>= \x -> return (fp : x)
+            (".png") -> go xs >>= \x -> return (fp : x)
             (_)      -> putStrLn ("This format is not supported ~ " ++ fp) >> go xs
 
 getSavePath :: Args -> IO FilePath

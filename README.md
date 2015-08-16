@@ -6,14 +6,13 @@ I will try to make the offline tool as identical as possible to the correspondin
 
 #### In testing:
 
-  * converting `.jpg` to `.c`
-  * convert from `.jpg` to `.raw`
+  * converting `.jpg` to `.raw` + `.c`
+  * converting `.bmp` to `.raw` + `.c`
+  * converting `.png` to `.raw` + `.c`
   * cmd parsing
 
 #### TODO:
 
-  * convert `.bmp` to `.raw` + `.c`
-  * convert `.png` to `.raw` + `.c`
   * test basic functionality with the Snap server (maybe create a testing environment)
   * learn about cabal packaging and how to deploy a simple project
 

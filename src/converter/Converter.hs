@@ -10,6 +10,7 @@ import Codec.Picture.Types
 import Codec.Picture.Saving (imageToBitmap)
 import Codec.Picture.Jpg    (decodeJpeg)
 import Codec.Picture.Bitmap (decodeBitmap)
+import Codec.Picture.Png    (decodePng)
 
 import RGB565               (toRGB565Hex)
 import C                    (toCFile)
@@ -21,6 +22,7 @@ pictureToRaw saveTo fp = do
   case takeExtension fp of
     (".jpg") -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
     (".bmp") -> bmpToDynImg fp >>= dynimgToRaw saveTo fp
+    (".png") -> pngToDynImg fp >>= dynimgToRaw saveTo fp
     (_)      -> error "Argument filter let through some unsupported types"
 
 pictureToC :: FilePath -> FilePath -> IO ()
@@ -28,6 +30,7 @@ pictureToC saveTo fp = do
   case takeExtension fp of
     (".jpg") -> jpgToDynImg fp >>= dynimgToC saveTo fp
     (".bmp") -> bmpToDynImg fp >>= dynimgToC saveTo fp
+    (".png") -> pngToDynImg fp >>= dynimgToC saveTo fp
     (_)      -> error "Argument filter let through some unsupported types"
 
 jpgToDynImg :: FilePath -> IO (Maybe DynamicImage)
@@ -39,6 +42,13 @@ jpgToDynImg fp = do
       case decodeBitmap (toStrict (imageToBitmap dynimg)) of
         Left err'     -> putStrLn ("Error happend while decoding the converted bmp: " ++ err') >> return Nothing
         Right dynimg' -> return $ Just dynimg'
+
+pngToDynImg :: FilePath -> IO (Maybe DynamicImage)
+pngToDynImg fp = do
+  bs <- BS.readFile fp
+  case decodePng bs of
+    Left err     -> putStrLn ("Error happend while decoding the png: " ++ err) >> return Nothing
+    Right dynimg -> return $ Just dynimg
 
 bmpToDynImg :: FilePath -> IO (Maybe DynamicImage)
 bmpToDynImg fp = do
