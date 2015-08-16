@@ -7,10 +7,11 @@ I will try to make the offline tool as identical as possible to the correspondin
 #### In testing:
 
   * converting `.jpg` to `.c`
+  * convert from `.jpg` to `.raw`
+  * cmd parsing
 
 #### TODO:
 
-  * convert from `.jpg` to `.raw`
   * convert `.bmp` to `.raw` + `.c`
   * convert `.png` to `.raw` + `.c`
   * test basic functionality with the Snap server (maybe create a testing environment)
