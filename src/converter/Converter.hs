@@ -11,6 +11,8 @@ import Codec.Picture.Saving (imageToBitmap)
 import Codec.Picture.Jpg    (decodeJpeg)
 import Codec.Picture.Bitmap (decodeBitmap)
 import Codec.Picture.Png    (decodePng)
+import Codec.Picture.Gif    (decodeGif)
+import Codec.Picture.Tga    (decodeTga)
 
 import RGB565               (toRGB565Hex)
 import C                    (toCFile)
@@ -23,6 +25,8 @@ pictureToRaw saveTo fp = do
     (".jpg") -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
     (".bmp") -> bmpToDynImg fp >>= dynimgToRaw saveTo fp
     (".png") -> pngToDynImg fp >>= dynimgToRaw saveTo fp
+    (".gif") -> gifToDynImg fp >>= dynimgToRaw saveTo fp
+    (".tga") -> tgaToDynImg fp >>= dynimgToRaw saveTo fp
     (_)      -> error "Argument filter let through some unsupported types"
 
 pictureToC :: FilePath -> FilePath -> IO ()
@@ -31,6 +35,8 @@ pictureToC saveTo fp = do
     (".jpg") -> jpgToDynImg fp >>= dynimgToC saveTo fp
     (".bmp") -> bmpToDynImg fp >>= dynimgToC saveTo fp
     (".png") -> pngToDynImg fp >>= dynimgToC saveTo fp
+    (".gif") -> gifToDynImg fp >>= dynimgToC saveTo fp
+    (".tga") -> tgaToDynImg fp >>= dynimgToC saveTo fp
     (_)      -> error "Argument filter let through some unsupported types"
 
 jpgToDynImg :: FilePath -> IO (Maybe DynamicImage)
@@ -43,6 +49,13 @@ jpgToDynImg fp = do
         Left err'     -> putStrLn ("Error happend while decoding the converted bmp: " ++ err') >> return Nothing
         Right dynimg' -> return $ Just dynimg'
 
+bmpToDynImg :: FilePath -> IO (Maybe DynamicImage)
+bmpToDynImg fp = do
+  bs <- BS.readFile fp
+  case decodeBitmap bs of
+    Left err     -> putStrLn ("Error happend while decoding the bmp: " ++ err) >> return Nothing
+    Right dynimg -> return $ Just dynimg
+
 pngToDynImg :: FilePath -> IO (Maybe DynamicImage)
 pngToDynImg fp = do
   bs <- BS.readFile fp
@@ -50,12 +63,20 @@ pngToDynImg fp = do
     Left err     -> putStrLn ("Error happend while decoding the png: " ++ err) >> return Nothing
     Right dynimg -> return $ Just dynimg
 
-bmpToDynImg :: FilePath -> IO (Maybe DynamicImage)
-bmpToDynImg fp = do
+gifToDynImg :: FilePath -> IO (Maybe DynamicImage)
+gifToDynImg fp = do
   bs <- BS.readFile fp
-  case decodeBitmap bs of
-    Left err     -> putStrLn ("Error happend while decoding the bmp: " ++ err) >> return Nothing
+  case decodeGif bs of
+    Left err     -> putStrLn ("Error happend while decoding the gif: " ++ err) >> return Nothing
     Right dynimg -> return $ Just dynimg
+
+tgaToDynImg :: FilePath -> IO (Maybe DynamicImage)
+tgaToDynImg fp = do
+  bs <- BS.readFile fp
+  case decodeTga bs of
+    Left err     -> putStrLn ("Error happend while decoding the tga: " ++ err) >> return Nothing
+    Right dynimg -> return $ Just dynimg
+
 
 dynimgToRaw :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
 dynimgToRaw      _  _      Nothing  = return ()
@@ -103,6 +124,6 @@ fromDynamicImage (ImageY8 img)    = pixelMap toRGBA8 img
 fromDynamicImage (ImageYA8 img)   = pixelMap toRGBA8 img
 fromDynamicImage (ImageRGB8 img)  = pixelMap toRGBA8 img
 fromDynamicImage (ImageRGBA8 img) = img
-fromDynamicImage _                = error "fromDynamicImage in Converter got an image type it doesn't know..."
+fromDynamicImage _                = error "fromDynamicImage in Converter got a not supportet Image..."
 
 ---- end of Codec.Picture.RGBA8

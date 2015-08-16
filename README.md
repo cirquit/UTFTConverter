@@ -9,6 +9,8 @@ I will try to make the offline tool as identical as possible to the correspondin
   * converting `.jpg` to `.raw` + `.c`
   * converting `.bmp` to `.raw` + `.c`
   * converting `.png` to `.raw` + `.c`
+  * converting `.gif` to `.raw` + `.c`
+  * converting `.tga` to `.raw` + `.c`
   * cmd parsing
 
 #### TODO:

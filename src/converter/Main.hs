@@ -32,6 +32,8 @@ getFilesFor l delim = go (takeWhile (delim /=) l)
             (".jpg") -> go xs >>= \x -> return (fp : x)
             (".bmp") -> go xs >>= \x -> return (fp : x)
             (".png") -> go xs >>= \x -> return (fp : x)
+            (".gif") -> go xs >>= \x -> return (fp : x)
+            (".tga") -> go xs >>= \x -> return (fp : x)
             (_)      -> putStrLn ("This format is not supported ~ " ++ fp) >> go xs
 
 getSavePath :: Args -> IO FilePath
