@@ -1,6 +1,6 @@
 ## UTFTConverter
 
-This is my take on an offline converter from `.jpg` to `.c` or `.raw` format and a simple server that you can start locally which accepts any `.jpg's` and responses with the parsed `.raw` file.
+This is my take on an offline converter from the below defined formats to `.c` or `.raw` format and a simple server that you can start locally which accepts any below defined formats and responses with the parsed `.raw` file.
 
 I will try to make the offline tool as identical as possible to the corresponding tool at [RinkyDink](http://www.rinkydinkelectronics.com/library.php?id=51).
 
@@ -15,6 +15,7 @@ I will try to make the offline tool as identical as possible to the correspondin
 
 #### TODO:
 
+  * add functionality to convert for AVR (?) and other platforms
   * test basic functionality with the Snap server (maybe create a testing environment)
   * learn about cabal packaging and how to deploy a simple project
 
