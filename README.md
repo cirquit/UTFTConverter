@@ -15,7 +15,7 @@ I will try to make the offline tool as identical as possible to the correspondin
 
 #### TODO:
 
-  * add functionality to convert for AVR (?) and other platforms
+  * add functionality to convert for AVR or ARM/PIC32
   * test basic functionality with the Snap server (maybe create a testing environment)
   * learn about cabal packaging and how to deploy a simple project
 
