@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeSynonymInstances #-}
-module Converter (pictureToRaw, pictureToC) where
+module Converter (pictureToRaw, pictureToCARM, pictureToCAVR) where
 
 import qualified Data.ByteString as BS (readFile)
 import Data.ByteString.Lazy            (toStrict)
@@ -15,7 +15,7 @@ import Codec.Picture.Gif    (decodeGif)
 import Codec.Picture.Tga    (decodeTga)
 
 import RGB565               (toRGB565Hex)
-import C                    (toCFile)
+import C                    (toCAVRFile, toCARMFile)
 import Raw                  (toRawFile)
 
 
@@ -29,8 +29,18 @@ pictureToRaw saveTo fp = do
     (".tga") -> tgaToDynImg fp >>= dynimgToRaw saveTo fp
     (_)      -> error "Argument filter let through some unsupported types"
 
-pictureToC :: FilePath -> FilePath -> IO ()
-pictureToC saveTo fp = do
+pictureToCARV :: FilePath -> FilePath -> IO ()
+pictureToCARV saveTo fp = do
+  case takeExtension fp of
+    (".jpg") -> jpgToDynImg fp >>= dynimgToC saveTo fp
+    (".bmp") -> bmpToDynImg fp >>= dynimgToC saveTo fp
+    (".png") -> pngToDynImg fp >>= dynimgToC saveTo fp
+    (".gif") -> gifToDynImg fp >>= dynimgToC saveTo fp
+    (".tga") -> tgaToDynImg fp >>= dynimgToC saveTo fp
+    (_)      -> error "Argument filter let through some unsupported types"
+
+pictureToCARM :: FilePath -> FilePath -> IO ()
+pictureToCARM saveTo fp = do
   case takeExtension fp of
     (".jpg") -> jpgToDynImg fp >>= dynimgToC saveTo fp
     (".bmp") -> bmpToDynImg fp >>= dynimgToC saveTo fp

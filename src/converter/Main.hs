@@ -4,7 +4,7 @@ import System.FilePath.Posix (takeExtension)
 import System.Directory      (getCurrentDirectory, createDirectoryIfMissing)
 import System.Environment    (getArgs, getProgName)
 
-import Converter             (pictureToC, pictureToRaw)
+import Converter             (pictureToCAVR, pictureToCARM, pictureToRaw)
 
 type Args = [String]
 
@@ -16,7 +16,7 @@ main = do
       | "/c" `elem` args, "/r" `notElem` args -> do
         files    <- args `getFilesFor` "/c"
         savepath <- getSavePath args
-        mapM_ (pictureToC savepath) files
+        mapM_ (pictureToCARM savepath) files
       | "/r" `elem` args, "/c" `notElem` args -> do
         files    <- args `getFilesFor` "/r"
         savepath <- getSavePath args
@@ -49,11 +49,15 @@ getSavePath l = do
 help :: String -> IO ()
 help name = do
   putStrLn   "Usage:                                           "
-  putStrLn $ "      " ++ name ++ " <filespec> /c|r [/o <path>]\n"
+  putStrLn $ "      " ++ name ++ " <filespec> /c|r [/o <path>] [/t AVR|ARM|PIC32]\n"
   putStrLn   "<filespec>:  File(s) to convert"
-  putStrLn   "parameters: /c        - Create output as .c array files"
-  putStrLn   "            /r        - Create output as .raw files"
-  putStrLn   "            /o <path> - Set the output directory to <path>\n"
+  putStrLn   "parameters: /c            - Create output as .c array files"
+  putStrLn   "            /r            - Create output as .raw files"
+  putStrLn   "            /o <path>     - Set the output directory to <path>\n"
+  putStrLn   "            /t <platform> - Select target plaform\n"
+  putStrLn   "                            AVR   : Most Arduinos, Bobuion\n"
+  putStrLn   "                            ARM   : Arduino Due, Teensy, TI CC3200 LaunchPad\n"
+  putStrLn   "                            PIC32 : All chipKit boards\n"
   putStrLn   "You must specify either /c or /r. All other parameters are optional."
   putStrLn   "If /o is ommited the current directory will be used for output."
 

@@ -1,3 +1,12 @@
+bin
+*.c
+*.jpg
+*.raw
+*.txt
+*.bmp
+*.tiff
+*.png
+*.gif
 dist
 cabal-dev
 *.o
