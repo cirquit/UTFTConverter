@@ -16,8 +16,8 @@ I will try to make the offline tool as identical as possible to the correspondin
 
 #### Differences to the Windows tool:
 
-  * You can specifiy as many files as you want, not only a directory (mydir/*.jpg still works, the shell does all the work for you)
-  * If you specify a target platform while converting to .raw the platform will not be printed
+  * You can specifiy as many files as you want, not only a directory (`mydir/*.jpg` still works, the shell does all the work for you)
+  * If you specify a target platform while converting to `.raw` the platform will not be printed
   * If you specify a non-existing directory, it will be created
 
 
