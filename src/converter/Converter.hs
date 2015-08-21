@@ -1,9 +1,10 @@
 {-# LANGUAGE TypeSynonymInstances #-}
-module Converter (pictureToRaw, pictureToCARM, pictureToCAVR) where
+module Converter (pictureToRaw, pictureToC) where
 
 import qualified Data.ByteString as BS (readFile)
 import Data.ByteString.Lazy            (toStrict)
-import System.FilePath.Posix           (takeBaseName, (</>), takeExtension)
+import System.FilePath.Posix           (takeBaseName, (</>),
+                                        takeExtension, takeFileName)
 import Data.Time                       (getCurrentTime)
 
 import Codec.Picture.Types
@@ -15,8 +16,9 @@ import Codec.Picture.Gif    (decodeGif)
 import Codec.Picture.Tga    (decodeTga)
 
 import RGB565               (toRGB565Hex)
-import C                    (toCAVRFile, toCARMFile)
+import C                    (toCFile, Platform())
 import Raw                  (toRawFile)
+
 
 
 pictureToRaw :: FilePath -> FilePath -> IO ()
@@ -29,24 +31,14 @@ pictureToRaw saveTo fp = do
     (".tga") -> tgaToDynImg fp >>= dynimgToRaw saveTo fp
     (_)      -> error "Argument filter let through some unsupported types"
 
-pictureToCARV :: FilePath -> FilePath -> IO ()
-pictureToCARV saveTo fp = do
+pictureToC :: Platform -> FilePath -> FilePath -> IO ()
+pictureToC platform saveTo fp = do
   case takeExtension fp of
-    (".jpg") -> jpgToDynImg fp >>= dynimgToC saveTo fp
-    (".bmp") -> bmpToDynImg fp >>= dynimgToC saveTo fp
-    (".png") -> pngToDynImg fp >>= dynimgToC saveTo fp
-    (".gif") -> gifToDynImg fp >>= dynimgToC saveTo fp
-    (".tga") -> tgaToDynImg fp >>= dynimgToC saveTo fp
-    (_)      -> error "Argument filter let through some unsupported types"
-
-pictureToCARM :: FilePath -> FilePath -> IO ()
-pictureToCARM saveTo fp = do
-  case takeExtension fp of
-    (".jpg") -> jpgToDynImg fp >>= dynimgToC saveTo fp
-    (".bmp") -> bmpToDynImg fp >>= dynimgToC saveTo fp
-    (".png") -> pngToDynImg fp >>= dynimgToC saveTo fp
-    (".gif") -> gifToDynImg fp >>= dynimgToC saveTo fp
-    (".tga") -> tgaToDynImg fp >>= dynimgToC saveTo fp
+    (".jpg") -> jpgToDynImg fp >>= dynimgToC platform saveTo fp
+    (".bmp") -> bmpToDynImg fp >>= dynimgToC platform saveTo fp
+    (".png") -> pngToDynImg fp >>= dynimgToC platform saveTo fp
+    (".gif") -> gifToDynImg fp >>= dynimgToC platform saveTo fp
+    (".tga") -> tgaToDynImg fp >>= dynimgToC platform saveTo fp
     (_)      -> error "Argument filter let through some unsupported types"
 
 jpgToDynImg :: FilePath -> IO (Maybe DynamicImage)
@@ -91,21 +83,23 @@ tgaToDynImg fp = do
 dynimgToRaw :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
 dynimgToRaw      _  _      Nothing  = return ()
 dynimgToRaw saveTo fp (Just dynimg) = do
-  let img  = fromDynamicImage dynimg
-      name = takeBaseName fp
+  let img     = fromDynamicImage dynimg
+      name    = takeBaseName fp
+      fname   = takeFileName fp
       content = toRawFile (encodePixels img)
   writeFile (saveTo </> name ++ ".raw") content
-  putStrLn $ "Converted " ++ name ++ ".raw"
+  putStrLn $ fname ++ " --> " ++ name ++ ".raw"
 
-dynimgToC :: FilePath -> FilePath -> Maybe DynamicImage -> IO ()
-dynimgToC _       _      Nothing  = return ()
-dynimgToC saveTo fp (Just dynimg) = do
+dynimgToC :: Platform -> FilePath -> FilePath -> Maybe DynamicImage -> IO ()
+dynimgToC        _      _  _      Nothing  = return ()
+dynimgToC platform saveTo fp (Just dynimg) = do
   time <- getCurrentTime
   let img@(Image w h _) = fromDynamicImage dynimg
       name              = takeBaseName fp
-      content           = toCFile (encodePixels img) name (w, h) time
+      fname   = takeFileName fp
+      content           = toCFile (encodePixels img) name (w, h) time platform
   writeFile (saveTo </> name ++ ".c") content
-  putStrLn $ "Converted " ++ name ++ ".c"
+  putStrLn $ fname ++ " --> " ++ name ++ ".c"
 
 encodePixels :: Image PixelRGBA8 -> [String]
 encodePixels img@(Image w h _) = [ format (pixelAt img y x) | x <- [0..(h-1)], y <- [0..(w-1)]]
