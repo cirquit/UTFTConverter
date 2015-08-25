@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeSynonymInstances #-}
-module Converter (pictureToRaw, pictureToC) where
+module Format.Converter (pictureToRaw, pictureToC) where
 
 import qualified Data.ByteString as BS (readFile)
 import Data.ByteString.Lazy            (toStrict)
@@ -15,9 +15,9 @@ import Codec.Picture.Png    (decodePng)
 import Codec.Picture.Gif    (decodeGif)
 import Codec.Picture.Tga    (decodeTga)
 
-import RGB565               (toRGB565Hex)
-import C                    (toCFile, Platform())
-import Raw                  (toRawFile)
+import Format.RGB565               (toRGB565Hex)
+import Format.C                    (toCFile, Platform())
+import Format.Raw                  (toRawFile)
 
 
 

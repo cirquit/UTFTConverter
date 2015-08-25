@@ -1,4 +1,4 @@
-module Raw (toRawFile) where
+module Format.Raw (toRawFile) where
 
 toRawFile :: [String] -> String
 toRawFile l = toRawArray l 1

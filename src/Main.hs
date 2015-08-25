@@ -6,8 +6,8 @@ import System.Environment    (getArgs, getProgName)
 
 import Control.Applicative   (pure, (<$>), (<*>))
 
-import Converter             (pictureToC, pictureToRaw)
-import C                     (Platform(..))
+import Format.Converter             (pictureToC, pictureToRaw)
+import Format.C                     (Platform(..))
 
 type Args = [String]
 

@@ -1,5 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
-module RGB565 (toRGB565, toRGB565Hex, to4Hex, toHex) where
+module Format.RGB565 (toRGB565, toRGB565Hex, to4Hex, toHex) where
 
 import Data.Bits (shiftL, shiftR, (.|.))
 import Data.Word (Word8())

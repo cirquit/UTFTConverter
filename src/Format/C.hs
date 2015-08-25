@@ -1,7 +1,7 @@
-module C (toCFile, Platform(..)) where
+module Format.C (toCFile, Platform(..)) where
 
 import Data.Time (UTCTime)
-import RGB565    (to4Hex)
+import Format.RGB565    (to4Hex)
 
 data Platform = AVR
               | ARM

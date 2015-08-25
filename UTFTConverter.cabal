@@ -46,6 +46,36 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 
+library
+
+  -- Modules exported by the library.
+  exposed-modules:     Format.C
+                     , Format.Converter
+                     , Format.Raw
+                     , Format.RGB565
+
+  -- Modules included in this library but not exported.
+  -- other-modules:
+
+  -- LANGUAGE extensions used by modules in this package.
+  other-extensions:    BangPatterns
+                     , TypeSynonymInstances
+
+  -- Other library packages from which modules are imported.
+  build-depends:       base        >=4.7  && <4.8
+                     , filepath    >=1.3  && <1.4
+                     , directory   >=1.2  && <1.3
+                     , time        >=1.4  && <1.5
+                     , bytestring  >=0.10 && <0.11
+                     , JuicyPixels >=3.2  && <3.3
+
+  -- Directories containing source files.
+  hs-source-dirs:      src
+
+  -- Base language which the package is written in.
+  default-language:    Haskell2010
+
+
 executable UTFTConverter
   -- .hs or .lhs file containing the Main module.
   main-is:             Main.hs
@@ -54,10 +84,17 @@ executable UTFTConverter
   -- other-modules:
 
   -- LANGUAGE extensions used by modules in this package.
-  other-extensions:    BangPatterns, TypeSynonymInstances
+  other-extensions:    BangPatterns
+                     , TypeSynonymInstances
 
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.7 && <4.8, filepath >=1.3 && <1.4, directory >=1.2 && <1.3, time >=1.4 && <1.5, bytestring >=0.10 && <0.11, JuicyPixels >=3.2 && <3.3
+  build-depends:       base             >=4.7  && <4.8
+                     , filepath         >=1.3  && <1.4
+                     , directory        >=1.2  && <1.3
+                     , time             >=1.4  && <1.5
+                     , bytestring       >=0.10 && <0.11
+                     , JuicyPixels      >=3.2  && <3.3
+                     --, UTFTConverter    ==0.1
 
   -- Directories containing source files.
   hs-source-dirs:      src
@@ -66,13 +103,27 @@ executable UTFTConverter
   default-language:    Haskell2010
 
   -- Compile flags
-  ghc-options:         -Wall
+  ghc-options:         -Wall -O2
+
 
 test-suite tests:
 
-  ghc-options:         -Wall
+  -- .hs or .lhs file containing the Main module.
   main-is:             Tests.hs
+
+  type:                exitcode-stdio-1.0
+  -- Directories containing source files.
   hs-source-dirs:      tests
-  build-depends:       base >=4.7 && <4.8, filepath >=1.3 && <1.4, directory >=1.2 && <1.3, time >=1.4 && <1.5, bytestring >=0.10 && <0.11, JuicyPixels >=3.2 && <3.3
+
+  -- Other library packages from which modules are imported.
+  build-depends:       base >=4.7 && <4.8
+                     , UTFTConverter
+
+  -- LANGUAGE extensions used by modules in this package.
   other-extensions:    BangPatterns, TypeSynonymInstances
+
+  -- Base language which the package is written in.
   default-language:    Haskell2010
+
+  -- Compile flags
+  ghc-options:         -Wall
