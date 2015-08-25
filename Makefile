@@ -1,5 +1,5 @@
 CFLAGS= -O2 -Wall
-OUT= -o bin/converter
+OUT= -o UTFTConverter
 CC= ghc
 
 
