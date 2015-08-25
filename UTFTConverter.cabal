@@ -66,4 +66,4 @@ executable UTFTConverter
   default-language:    Haskell2010
 
   -- Compile flags
-  ghc-options:         -Wall -o bin/converter
+  ghc-options:         -Wall

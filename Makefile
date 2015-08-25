@@ -6,18 +6,18 @@ CC= ghc
 all: converter clean
 
 
-converter: src/converter/Main.hs\
-					 src/converter/Converter.hs\
-					 src/converter/Raw.hs\
-					 src/converter/C.hs\
-					 src/converter/RGB565.hs
+converter: src/Main.hs\
+					 src/Converter.hs\
+					 src/Raw.hs\
+					 src/C.hs\
+					 src/RGB565.hs
 
 	$(CC) $(CFLAGS) $(OUT) \
-		src/converter/Main.hs\
-		src/converter/Converter.hs\
-		src/converter/Raw.hs\
-		src/converter/C.hs\
-		src/converter/RGB565.hs
+		src/Main.hs\
+		src/Converter.hs\
+		src/Raw.hs\
+		src/C.hs\
+		src/RGB565.hs
 
 
 clean:
