@@ -8,38 +8,42 @@ import System.FilePath.Posix           (takeBaseName, (</>),
 import Data.Time                       (getCurrentTime)
 
 import Codec.Picture.Types
-import Codec.Picture.Saving (imageToBitmap)
-import Codec.Picture.Jpg    (decodeJpeg)
-import Codec.Picture.Bitmap (decodeBitmap)
-import Codec.Picture.Png    (decodePng)
-import Codec.Picture.Gif    (decodeGif)
-import Codec.Picture.Tga    (decodeTga)
+import Codec.Picture.Saving            (imageToBitmap)
+import Codec.Picture.Jpg               (decodeJpeg)
+import Codec.Picture.Bitmap            (decodeBitmap)
+import Codec.Picture.Png               (decodePng)
+import Codec.Picture.Gif               (decodeGif)
+import Codec.Picture.Tga               (decodeTga)
 
-import Format.RGB565               (toRGB565Hex)
-import Format.C                    (toCFile, Platform())
-import Format.Raw                  (toRawFile)
+import Format.RGB565                   (toRGB565Hex)
+import Format.C                        (toCFile, Platform())
+import Format.Raw                      (toRawFile)
 
 
 
 pictureToRaw :: FilePath -> FilePath -> IO ()
 pictureToRaw saveTo fp = do
   case takeExtension fp of
-    (".jpg") -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
-    (".bmp") -> bmpToDynImg fp >>= dynimgToRaw saveTo fp
-    (".png") -> pngToDynImg fp >>= dynimgToRaw saveTo fp
-    (".gif") -> gifToDynImg fp >>= dynimgToRaw saveTo fp
-    (".tga") -> tgaToDynImg fp >>= dynimgToRaw saveTo fp
-    (_)      -> error "Argument filter let through some unsupported types"
+    (".jpg")  -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
+    (".jpeg") -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
+    (".jpe")  -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
+    (".bmp")  -> bmpToDynImg fp >>= dynimgToRaw saveTo fp
+    (".png")  -> pngToDynImg fp >>= dynimgToRaw saveTo fp
+    (".gif")  -> gifToDynImg fp >>= dynimgToRaw saveTo fp
+    (".tga")  -> tgaToDynImg fp >>= dynimgToRaw saveTo fp
+    (_)       -> error "Argument filter let through some unsupported types"
 
 pictureToC :: Platform -> FilePath -> FilePath -> IO ()
 pictureToC platform saveTo fp = do
   case takeExtension fp of
-    (".jpg") -> jpgToDynImg fp >>= dynimgToC platform saveTo fp
-    (".bmp") -> bmpToDynImg fp >>= dynimgToC platform saveTo fp
-    (".png") -> pngToDynImg fp >>= dynimgToC platform saveTo fp
-    (".gif") -> gifToDynImg fp >>= dynimgToC platform saveTo fp
-    (".tga") -> tgaToDynImg fp >>= dynimgToC platform saveTo fp
-    (_)      -> error "Argument filter let through some unsupported types"
+    (".jpg")  -> jpgToDynImg fp >>= dynimgToC platform saveTo fp
+    (".jpeg") -> jpgToDynImg fp >>= dynimgToC platform saveTo fp
+    (".jpe")  -> jpgToDynImg fp >>= dynimgToC platform saveTo fp
+    (".bmp")  -> bmpToDynImg fp >>= dynimgToC platform saveTo fp
+    (".png")  -> pngToDynImg fp >>= dynimgToC platform saveTo fp
+    (".gif")  -> gifToDynImg fp >>= dynimgToC platform saveTo fp
+    (".tga")  -> tgaToDynImg fp >>= dynimgToC platform saveTo fp
+    (_)       -> error "Argument filter let through some unsupported types"
 
 jpgToDynImg :: FilePath -> IO (Maybe DynamicImage)
 jpgToDynImg fp = do
@@ -96,8 +100,9 @@ dynimgToC platform saveTo fp (Just dynimg) = do
   time <- getCurrentTime
   let img@(Image w h _) = fromDynamicImage dynimg
       name              = takeBaseName fp
-      fname   = takeFileName fp
-      content           = toCFile (encodePixels img) name (w, h) time platform
+      ext               = takeExtension fp
+      fname             = takeFileName fp
+      content           = toCFile (encodePixels img) (name, ext) (w, h) time platform
   writeFile (saveTo </> name ++ ".c") content
   putStrLn $ fname ++ " --> " ++ name ++ ".c"
 
@@ -128,6 +133,6 @@ fromDynamicImage (ImageY8 img)    = pixelMap toRGBA8 img
 fromDynamicImage (ImageYA8 img)   = pixelMap toRGBA8 img
 fromDynamicImage (ImageRGB8 img)  = pixelMap toRGBA8 img
 fromDynamicImage (ImageRGBA8 img) = img
-fromDynamicImage _                = error "fromDynamicImage in Converter got a not supportet Image..."
+fromDynamicImage _                = error "fromDynamicImage in Converter got a not supported DynamicImage format!"
 
 ---- end of Codec.Picture.RGBA8

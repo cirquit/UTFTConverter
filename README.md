@@ -21,7 +21,7 @@ I will try to make the offline tool as identical as possible to the correspondin
 
   * You can specifiy as many files as you want, not only a directory (`mydir/*.jpg` still works, the shell does all the work for you)
   * If you specify a target platform while converting to `.raw` the platform will not be printed
-  * If you specify a non-existing directory, it will be created
+  * If you specify a non-existing directory as target, it will be created
   * The length of the array is NOT preceded by `0x`
   * The output for the different platforms is exactly the same, but it's not the one you get if you use the online converter at [RinkyDink](http://www.rinkydinkelectronics.com/t_imageconverter565.php). I still have to understand the differences in the header
 

@@ -6,8 +6,8 @@ import System.Environment    (getArgs, getProgName)
 
 import Control.Applicative   (pure, (<$>), (<*>))
 
-import Format.Converter             (pictureToC, pictureToRaw)
-import Format.C                     (Platform(..))
+import Format.Converter      (pictureToC, pictureToRaw)
+import Format.C              (Platform(..))
 
 type Args = [String]
 
@@ -48,12 +48,14 @@ getFilesFor l delim = go (takeWhile (delim /=) l)
         go []      = return []
         go (fp:xs) = do
           case takeExtension fp of
-            (".jpg") -> go xs >>= \x -> return (fp : x)
-            (".bmp") -> go xs >>= \x -> return (fp : x)
-            (".png") -> go xs >>= \x -> return (fp : x)
-            (".gif") -> go xs >>= \x -> return (fp : x)
-            (".tga") -> go xs >>= \x -> return (fp : x)
-            (_)      -> putStrLn ("This format is not supported ~ " ++ fp) >> go xs
+            (".jpg")  -> go xs >>= \x -> return (fp : x)
+            (".jpeg") -> go xs >>= \x -> return (fp : x)
+            (".jpe")  -> go xs >>= \x -> return (fp : x)
+            (".bmp")  -> go xs >>= \x -> return (fp : x)
+            (".png")  -> go xs >>= \x -> return (fp : x)
+            (".gif")  -> go xs >>= \x -> return (fp : x)
+            (".tga")  -> go xs >>= \x -> return (fp : x)
+            (_)       -> putStrLn ("This format is not supported ~ " ++ fp) >> go xs
 
 getSavePath :: Args -> IO (FilePath, Args)
 getSavePath l = do
