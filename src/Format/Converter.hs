@@ -19,8 +19,6 @@ import Format.RGB565                   (toRGB565Hex)
 import Format.C                        (toCFile, Platform())
 import Format.Raw                      (toRawFile)
 
-
-
 pictureToRaw :: FilePath -> FilePath -> IO ()
 pictureToRaw saveTo fp = do
   case takeExtension fp of
