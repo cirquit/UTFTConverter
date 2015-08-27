@@ -74,6 +74,9 @@ author:              Alexander Isenko
 -- patches.
 maintainer:          alex.isenko@googlemail.com
 
+-- The homepage of the package
+homepage:            www.github.com/cirquit/UTFTConverter
+
 -- A copyright notice.
 -- copyright:
 
@@ -83,7 +86,9 @@ build-type:          Simple
 
 -- Extra files to be distributed with the package, such as examples or a
 -- README.
--- extra-source-files:
+extra-source-files:  tests
+                   , Makefile
+                   , README.md
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.10

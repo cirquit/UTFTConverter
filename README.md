@@ -7,14 +7,14 @@ I will try to make the offline tool as identical as possible to the correspondin
 #### Working
 
   * AVR / PIC32 / ARM compatibility (tested offline with the output from the corresponding tool)
-
-#### In testing:
-
   * converting `.jpg` to `.raw` + `.c`
   * converting `.bmp` to `.raw` + `.c`
   * converting `.png` to `.raw` + `.c`
   * converting `.gif` to `.raw` + `.c`
   * converting `.tga` to `.raw` + `.c`
+
+#### In testing:
+
   * cmd parsing
 
 #### Differences to the Windows tool:
@@ -27,8 +27,7 @@ I will try to make the offline tool as identical as possible to the correspondin
 
 #### TODO:
 
-  * test basic functionality with the Snap server (maybe create a testing environment)
-  * learn about cabal packaging and how to deploy a simple project
+  * use the GetOpts library
   * maybe add resizing with a basic linear algorithm
   * I'm planning to make a simple API that you can start locally which accepts any below defined formats and responses with the parsed `.raw` file. (another project)
 

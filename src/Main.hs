@@ -1,8 +1,10 @@
 module Main where
 
 import System.FilePath.Posix (takeExtension)
-import System.Directory      (getCurrentDirectory, createDirectoryIfMissing)
+import System.Directory      (getCurrentDirectory, createDirectoryIfMissing,
+                              doesFileExist)
 import System.Environment    (getArgs, getProgName)
+import System.Exit           (exitFailure)
 
 import Control.Applicative   (pure, (<$>), (<*>))
 
@@ -43,26 +45,35 @@ main = do
     (_) -> getProgName >>= help
 
 getFilesFor :: Args -> String -> IO [FilePath]
-getFilesFor l delim = go (takeWhile (delim /=) l)
+getFilesFor l delim = do
+  files <- go (takeWhile (delim /=) l)
+  if null files
+    then exitFailure
+    else return files
   where go :: [String] -> IO [FilePath]
         go []      = return []
         go (fp:xs) = do
-          case takeExtension fp of
-            (".jpg")  -> go xs >>= \x -> return (fp : x)
-            (".jpeg") -> go xs >>= \x -> return (fp : x)
-            (".jpe")  -> go xs >>= \x -> return (fp : x)
-            (".bmp")  -> go xs >>= \x -> return (fp : x)
-            (".png")  -> go xs >>= \x -> return (fp : x)
-            (".gif")  -> go xs >>= \x -> return (fp : x)
-            (".tga")  -> go xs >>= \x -> return (fp : x)
-            (_)       -> putStrLn ("This format is not supported ~ " ++ fp) >> go xs
+          exists <- doesFileExist fp
+          case (exists, takeExtension fp) of
+            (True, ".jpg")  -> go xs >>= \x -> return (fp : x)
+            (True, ".jpeg") -> go xs >>= \x -> return (fp : x)
+            (True, ".jpe")  -> go xs >>= \x -> return (fp : x)
+            (True, ".bmp")  -> go xs >>= \x -> return (fp : x)
+            (True, ".png")  -> go xs >>= \x -> return (fp : x)
+            (True, ".gif")  -> go xs >>= \x -> return (fp : x)
+            (True, ".tga")  -> go xs >>= \x -> return (fp : x)
+            (True,      _)  -> putStrLn ("This format is not supported ~ " ++ fp) >> go xs
+            (False,     _)  -> putStrLn ("This file does not exist ~ " ++ fp)     >> go xs
 
 getSavePath :: Args -> IO (FilePath, Args)
 getSavePath l = do
   case dropWhile ("/o" /=) l of
+    ["/o"]                      -> putStrLn "WARNING: Output directory missing. Using default output directory."
+                                >> getCurrentDirectory      >>= \dir -> return (dir, [])
     ("/o" : "/t" : rest)        -> putStrLn "WARNING: Output directory missing. Using default output directory."
                                 >> getCurrentDirectory      >>= \dir -> return (dir, rest)
     ("/o" : dir  : "/t" : rest) -> createDirectoryIfMissing True dir >> return (dir, rest)
+    ("/o" : dir  : [])          -> createDirectoryIfMissing True dir >> return (dir, [])
     ("/o" : dir  : rest)        -> putStrLn "WARNING: More than one output directory specified, using the first one."
                                 >> createDirectoryIfMissing True dir >> return (dir, rest)
     _                           -> (,) <$> getCurrentDirectory <*> pure l
