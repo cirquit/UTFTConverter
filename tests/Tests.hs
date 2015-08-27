@@ -7,7 +7,6 @@ import System.Directory                (getCurrentDirectory, doesDirectoryExist,
                                         createDirectory, getDirectoryContents,
                                         removeDirectoryRecursive)
 import System.FilePath.Posix           ((</>))
-import Control.Applicative             ((<$>))
 import Data.List                       (foldl')
 
 main :: IO ()
@@ -79,7 +78,7 @@ main = do
           dir2 <- getExamplePicsPath dir ("tests" </> "examples" </> "cat_02")
           dir3 <- getExamplePicsPath dir ("tests" </> "examples" </> "cat_03")
           length (dir1 ++ dir2 ++ dir3) `shouldBe` 15
-        it "cat_01 pics should be all converted to almost the same .raw-files (>98% similarity)" $ do
+        it "cat_01 pics should be all converted to almost the same .raw-files (>99% similarity)" $ do
           createDirectory "tmp"
           pics <- getExamplePicsPath dir ("tests" </> "examples" </> "cat_01")
           mapM_ (pictureToRaw (dir </> "tmp")) pics
@@ -89,9 +88,44 @@ main = do
               r2 = picSimilarity p1 p3
               r3 = picSimilarity p1 p4
               r4 = picSimilarity p1 p5
+          putStrLn $ "Pic similarity for p1 ~ p2: " ++ show r1
+          putStrLn $ "Pic similarity for p1 ~ p3: " ++ show r2
+          putStrLn $ "Pic similarity for p1 ~ p4: " ++ show r3
+          putStrLn $ "Pic similarity for p1 ~ p5: " ++ show r4
           removeDirectoryRecursive (dir </> "tmp")
           ((r1 + r2 + r3 + r4) / 4) > 98 `shouldBe` True
-
+        it "cat_02 pics should be all converted to almost the same .raw-files (>99% similarity)" $ do
+          createDirectory "tmp"
+          pics <- getExamplePicsPath dir ("tests" </> "examples" </> "cat_02")
+          mapM_ (pictureToRaw (dir </> "tmp")) pics
+          rawfps <- getExamplePicsPath dir "tmp"
+          [p1, p2, p3, p4, p5] <- mapM readFile rawfps
+          let r1 = picSimilarity p1 p2
+              r2 = picSimilarity p1 p3
+              r3 = picSimilarity p1 p4
+              r4 = picSimilarity p1 p5
+          putStrLn $ "Pic similarity for p1 ~ p2: " ++ show r1
+          putStrLn $ "Pic similarity for p1 ~ p3: " ++ show r2
+          putStrLn $ "Pic similarity for p1 ~ p4: " ++ show r3
+          putStrLn $ "Pic similarity for p1 ~ p5: " ++ show r4
+          removeDirectoryRecursive (dir </> "tmp")
+          ((r1 + r2 + r3 + r4) / 4) > 98 `shouldBe` True
+        it "cat_03 pics should be all converted to almost the same .raw-files (>99% similarity)" $ do
+          createDirectory "tmp"
+          pics <- getExamplePicsPath dir ("tests" </> "examples" </> "cat_03")
+          mapM_ (pictureToRaw (dir </> "tmp")) pics
+          rawfps <- getExamplePicsPath dir "tmp"
+          [p1, p2, p3, p4, p5] <- mapM readFile rawfps
+          let r1 = picSimilarity p1 p2
+              r2 = picSimilarity p1 p3
+              r3 = picSimilarity p1 p4
+              r4 = picSimilarity p1 p5
+          putStrLn $ "Pic similarity for p1 ~ p2: " ++ show r1
+          putStrLn $ "Pic similarity for p1 ~ p3: " ++ show r2
+          putStrLn $ "Pic similarity for p1 ~ p4: " ++ show r3
+          putStrLn $ "Pic similarity for p1 ~ p5: " ++ show r4
+          removeDirectoryRecursive (dir </> "tmp")
+          ((r1 + r2 + r3 + r4) / 4) > 98 `shouldBe` True
 
 
 getExamplePicsPath :: FilePath -> FilePath -> IO [FilePath]
