@@ -70,12 +70,12 @@ getSavePath l = do
   case dropWhile ("/o" /=) l of
     ["/o"]                      -> putStrLn "WARNING: Output directory missing. Using default output directory."
                                 >> getCurrentDirectory      >>= \dir -> return (dir, [])
-    ("/o" : "/t" : rest)        -> putStrLn "WARNING: Output directory missing. Using default output directory."
-                                >> getCurrentDirectory      >>= \dir -> return (dir, rest)
-    ("/o" : dir  : "/t" : rest) -> createDirectoryIfMissing True dir >> return (dir, rest)
     ("/o" : dir  : [])          -> createDirectoryIfMissing True dir >> return (dir, [])
     ("/o" : dir  : rest)        -> putStrLn "WARNING: More than one output directory specified, using the first one."
                                 >> createDirectoryIfMissing True dir >> return (dir, rest)
+    ("/o" : "/t" : rest)        -> putStrLn "WARNING: Output directory missing. Using default output directory."
+                                >> getCurrentDirectory      >>= \dir -> return (dir, rest)
+    ("/o" : dir  : "/t" : rest) -> createDirectoryIfMissing True dir >> return (dir, rest)
     _                           -> (,) <$> getCurrentDirectory <*> pure l
 
 getPlatform :: Args -> IO Platform
