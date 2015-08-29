@@ -13,6 +13,7 @@ I will try to make the offline tool as identical as possible to the correspondin
   * converting `.gif` to `.raw` + `.c`
   * converting `.tga` to `.raw` + `.c`
   * cmd parsing
+  * tested with the Arduino Mega and a 3.2" TFT Display and the UTFT library for all formats
 
 #### Usage:
 
@@ -27,6 +28,7 @@ I will try to make the offline tool as identical as possible to the correspondin
                               AVR   : Most Arduinos, Bobuion
                               ARM   : Arduino Due, Teensy, TI CC3200 LaunchPad
                               PIC32 : All chipKit boards\n
+
   You must specify either /c or /r. All other parameters are optional.
   If /o is ommited the current directory will be used for output.
   If /t is ommited the target platform will be set to AVR.
