@@ -49,8 +49,9 @@ description:
     * If you specify a non-existing directory as target, it will be created
     * The length of the array is NOT preceded by '0x'
     * The output for the different platforms is exactly the same, but it's not the one you get if you use the online converter at RinkyDink
+    * You can use the flags in any order you want
   .
-
+  .
   The exported library is using <http://hackage.haskell.org/package/JuicyPixels JuicyPixels> to convert incoming
    * '.gif'
    * '.png'
