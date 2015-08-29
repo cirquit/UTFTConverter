@@ -1,6 +1,6 @@
 module Main where
 
-import System.FilePath.Posix (takeExtension)
+import System.FilePath.Posix (takeExtension, (</>))
 import System.Directory      (getCurrentDirectory, createDirectoryIfMissing,
                               doesFileExist)
 import System.Environment    (getArgs, getProgName)
@@ -13,100 +13,99 @@ import Format.C              (Platform(..))
 
 type Args = [String]
 
-data FileType = Raw
-              | C
+data FileType = C | Raw
 
-instance Show FileType where
-  show C   = ".c array file(s)"
-  show Raw = ".raw file(s)"
+data Option = Option
+ { outdir   :: FilePath
+ , platform :: Platform
+ , filetype :: Maybe FileType
+ , files    :: [FilePath]
+ }
 
-data ProcessingInfo = PInfo { mplatform :: Maybe Platform
-                            , outdir    :: FilePath
-                            , filetype  :: FileType
-                            }
 
-main :: IO()
+main :: IO ()
 main = do
-  args <- getArgs
-  case args of
-    (_)
-      | "/c" `elem` args, "/r" `notElem` args -> do
-        files            <- args `getFilesFor` "/c"
-        (savepath, rest) <- getSavePath args
-        pltform          <- getPlatform rest
-        printProcessingInfo $ PInfo { mplatform = (Just pltform), outdir = savepath, filetype = C }
-        mapM_ (pictureToC pltform savepath) files
-      | "/r" `elem` args, "/c" `notElem` args -> do
-        files            <- args `getFilesFor` "/r"
-        (savepath, rest) <- getSavePath args
-        _                <- getPlatform rest
-        printProcessingInfo $ PInfo { mplatform = Nothing, outdir = savepath, filetype = Raw }
-        mapM_ (pictureToRaw savepath) files
-    (_) -> getProgName >>= help
+  args    <- getArgs
+  defopts <- defaultOptions
+  opt     <- argsParser args defopts
+  case opt of
+    Option _       _         _               [] -> putStrLn "ERROR: No valid files found to convert."  >> help >> exitFailure
+    Option outdir' platform' (Just C)    files' -> printOpt (outdir', platform', C  ) >> mapM_ (pictureToC   platform' outdir') files'
+    Option outdir' platform' (Just Raw)  files' -> printOpt (outdir', platform', Raw) >> mapM_ (pictureToRaw           outdir') files'
+    Option _       _         Nothing     _      -> putStrLn "ERROR: No filetype defined."              >> help >> exitFailure
 
-getFilesFor :: Args -> String -> IO [FilePath]
-getFilesFor l delim = do
-  files <- go (takeWhile (delim /=) l)
-  if null files
-    then exitFailure
-    else return files
-  where go :: [String] -> IO [FilePath]
-        go []      = return []
-        go (fp:xs) = do
-          exists <- doesFileExist fp
-          case (exists, takeExtension fp) of
-            (True, ".jpg")  -> go xs >>= \x -> return (fp : x)
-            (True, ".jpeg") -> go xs >>= \x -> return (fp : x)
-            (True, ".jpe")  -> go xs >>= \x -> return (fp : x)
-            (True, ".bmp")  -> go xs >>= \x -> return (fp : x)
-            (True, ".png")  -> go xs >>= \x -> return (fp : x)
-            (True, ".gif")  -> go xs >>= \x -> return (fp : x)
-            (True, ".tga")  -> go xs >>= \x -> return (fp : x)
-            (True,      _)  -> putStrLn ("This format is not supported ~ " ++ fp) >> go xs
-            (False,     _)  -> putStrLn ("This file does not exist ~ " ++ fp)     >> go xs
+defaultOptions :: IO Option
+defaultOptions = do
+  dir <- getCurrentDirectory
+  return $ Option dir AVR Nothing []
 
-getSavePath :: Args -> IO (FilePath, Args)
-getSavePath l = do
-  case dropWhile ("/o" /=) l of
-    ["/o"]                      -> putStrLn "WARNING: Output directory missing. Using default output directory."
-                                >> getCurrentDirectory      >>= \dir -> return (dir, [])
-    ("/o" : dir  : [])          -> createDirectoryIfMissing True dir >> return (dir, [])
-    ("/o" : dir  : rest)        -> putStrLn "WARNING: More than one output directory specified, using the first one."
-                                >> createDirectoryIfMissing True dir >> return (dir, rest)
-    ("/o" : "/t" : rest)        -> putStrLn "WARNING: Output directory missing. Using default output directory."
-                                >> getCurrentDirectory      >>= \dir -> return (dir, rest)
-    ("/o" : dir  : "/t" : rest) -> createDirectoryIfMissing True dir >> return (dir, rest)
-    _                           -> (,) <$> getCurrentDirectory <*> pure l
+argsParser :: Args -> Option -> IO Option
+argsParser [] opt          = return opt
 
-getPlatform :: Args -> IO Platform
-getPlatform l =
-    case dropWhile ("/t" /=) l of
-      ("/t" : "ARM"   : rest) -> warning rest >> return ARM
-      ("/t" : "AVR"   : rest) -> warning rest >> return AVR
-      ("/t" : "PIC32" : rest) -> warning rest >> return PIC32
-      [""]                    -> return AVR
-      ("/t": rest   )         -> do
-        putStrLn $ "WARNING: Unknown target platform " ++ unwords rest ++ " will be ignored. Using default target platform.\n"
-        warning rest
-        return AVR
-      rest            -> warning rest >> return AVR
-  where warning = mapM_ (\x -> putStrLn $ "WARNING: Unknown parameter " ++ x)
+-- filetype parser
+argsParser ("/c"        :xs) opt
+  | Just _ <- filetype opt = putStrLn "ERROR: You can only specifiy one target platform" >> exitFailure
+  | otherwise              = argsParser xs (opt { filetype = Just C   } )
+argsParser ("/r"        :xs) opt
+  | Just _ <- filetype opt = putStrLn "ERROR: You can only specifiy one target platform" >> exitFailure
+  | otherwise              = argsParser xs (opt { filetype = Just Raw } )
 
-printProcessingInfo :: ProcessingInfo -> IO ()
-printProcessingInfo (PInfo        Nothing savepath fltype) = do
-  putStrLn $ "Converting to     : " ++ show fltype ++ "\n"
-  putStrLn $ "Output directory  : " ++ savepath      ++ "\n"
+-- platform parser
+argsParser ("/t":"AVR"  :xs) opt = argsParser xs (opt { platform = AVR   } )
+argsParser ("/t":"PIC32":xs) opt = argsParser xs (opt { platform = PIC32 } )
+argsParser ("/t":"ARM"  :xs) opt = argsParser xs (opt { platform = ARM   } )
+argsParser ("/t"        :xs) opt = do
+  putStrLn "WARNING: Platform not specified or unknown. Using the default platform"
+  argsParser xs opt
+
+-- output directory parser
+
+argsParser ("/o":"/t"   :xs) opt = do
+  putStrLn     "WARNING: Output directory is missing. Using default output directory"
+  argsParser ("/t":xs) opt
+argsParser ("/o":fp     :xs) opt = do
+  case takeExtension fp of
+    ""   -> do
+      createDirectoryIfMissing True fp
+      dir <- getCurrentDirectory
+      argsParser xs (opt { outdir = dir </> fp } )
+    _    -> do
+      putStrLn "WARNING: Output directory has an extention. Using default output directory"
+      argsParser xs opt
+argsParser ("/o"        :xs) opt = do
+  putStrLn     "WARNING: Output directory is missing. Using default output directory"
+  argsParser xs opt
+
+
+-- files parser
+argsParser (fp           :xs) opt = do
+  exists <- doesFileExist fp
+  case (exists, takeExtension fp) of
+    (True, ".jpg")  -> argsParser xs (opt { files = fp : files opt})
+    (True, ".jpeg") -> argsParser xs (opt { files = fp : files opt})
+    (True, ".jpe")  -> argsParser xs (opt { files = fp : files opt})
+    (True, ".bmp")  -> argsParser xs (opt { files = fp : files opt})
+    (True, ".png")  -> argsParser xs (opt { files = fp : files opt})
+    (True, ".gif")  -> argsParser xs (opt { files = fp : files opt})
+    (True, ".tga")  -> argsParser xs (opt { files = fp : files opt})
+    (True,      _)  -> putStrLn ("WARNING: This format is not supported ~ " ++ fp) >> argsParser xs opt
+    (False,     _)  -> putStrLn ("WARNING: Unreconized flag ~ "    ++ fp) >> argsParser xs opt
+
+printOpt :: (FilePath, Platform, FileType) -> IO ()
+printOpt (outdir', platform', C)   = do
+  putStrLn $ "Converting to     : .c array file(s)"
+  putStrLn $ "Target platform   : " ++ show platform'
+  putStrLn $ "Output directory  : " ++ outdir'        ++ "\n"
   putStrLn   "Processing file(s):"
-printProcessingInfo (PInfo (Just platform) savepath fltype) = do
-  putStrLn $ "Converting to     : " ++ show fltype
-  putStrLn $ "Target platform   : " ++ show platform ++ "\n"
-  putStrLn $ "Output directory  : " ++ savepath      ++ "\n"
+printOpt (outdir',        _, Raw) = do
+  putStrLn $ "Converting to     : .raw file(s)"
+  putStrLn $ "Output directory  : " ++ outdir'        ++ "\n"
   putStrLn   "Processing file(s):"
 
-
-help :: String -> IO ()
-help name = do
-  putStrLn   "Usage:                                           "
+help :: IO ()
+help = do
+  name <- getProgName
+  putStrLn   "\nUsage:                                           "
   putStrLn $ "      " ++ name ++ " <filespec> /c|r [/o <path>] [/t AVR|ARM|PIC32]\n"
   putStrLn   "<filespec>:  File(s) to convert"
   putStrLn   "parameters: /c            - Create output as .c array files"
@@ -119,4 +118,3 @@ help name = do
   putStrLn   "You must specify either /c or /r. All other parameters are optional."
   putStrLn   "If /o is ommited the current directory will be used for output."
   putStrLn   "If /t is ommited the target platform will be set to AVR."
-
