@@ -16,19 +16,19 @@ I will try to make the offline tool as identical as possible to the correspondin
 
 #### Usage:
 
-  `./UTFTConverter <filespec> /c|r [/o <path>] [/t AVR|ARM|PIC32]\n`
-
-  `<filespec>:  File(s) to convert`
-  `parameters: /c            - Create output as .c array files`
-  `            /r            - Create output as .raw files`
-  `            /o <path>     - Set the output directory to <path>\n`
-  `            /t <platform> - Select target plaform`
-  `                            AVR   : Most Arduinos, Bobuion`
-  `                            ARM   : Arduino Due, Teensy, TI CC3200 LaunchPad`
-  `                            PIC32 : All chipKit boards\n`
-  `You must specify either /c or /r. All other parameters are optional.`
-  `If /o is ommited the current directory will be used for output.`
-  `If /t is ommited the target platform will be set to AVR.`
+  >./UTFTConverter <filespec> /c|r [/o <path>] [/t AVR|ARM|PIC32]\n
+  >
+  ><filespec>:  File(s) to convert
+  >parameters: /c            - Create output as .c array files
+  >            /r            - Create output as .raw files
+  >            /o <path>     - Set the output directory to <path>\n
+  >            /t <platform> - Select target plaform
+  >                            AVR   : Most Arduinos, Bobuion
+  >                            ARM   : Arduino Due, Teensy, TI CC3200 LaunchPad
+  >                            PIC32 : All chipKit boards\n
+  >You must specify either /c or /r. All other parameters are optional.
+  >If /o is ommited the current directory will be used for output.
+  >If /t is ommited the target platform will be set to AVR.
 
 #### Differences to the Windows tool:
 
