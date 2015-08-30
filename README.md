@@ -15,7 +15,7 @@ Install the Glasgow Haskell Compiler and `cabal` OR the Haskell packaging tool
   * run `./bootstrap.sh`
 
 #####For any operation system:
-  * Follow the instructions for your operation system on [www.haskell.org/platform](www.haskell.org/platform)
+  * Follow the instructions for your operation system on www.haskell.org/platform
 
 
 When you have `ghc` and `cabal` or the Haskell Platform installed:
