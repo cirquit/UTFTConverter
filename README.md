@@ -6,29 +6,29 @@ I will try to make the offline tool as identical as possible to the correspondin
 
 #### How to install - you have two options:
 
-Install the Glasgow Haskell Compiler and 'cabal' or the Haskell packaging tool
+Install the Glasgow Haskell Compiler and 'cabal' OR the Haskell packaging tool
 
-* For Ubuntu distributions:
-  ** 'sudo apt-get install ghc'
-  ** download the cabal-install.tar.gz-file from [cabal](http://hackage.haskell.org/package/cabal-install)
-  ** unpack the .tar.gz file, the cabal-install folder should include a 'bootstrap.sh'
-  ** run './bootstrap.sh'
+'''For Ubuntu distributions:'''
+  * 'sudo apt-get install ghc'
+  * download the cabal-install.tar.gz-file from [cabal](http://hackage.haskell.org/package/cabal-install)
+  * unpack the .tar.gz file, the cabal-install folder should include a 'bootstrap.sh'
+  * run './bootstrap.sh'
 
-* For any operation system:
-  ** Follow the instructions for your operation system on [www.haskell.org/platform](www.haskell.org/platform)
+'''For any operation system:'''
+  * Follow the instructions for your operation system on [www.haskell.org/platform](www.haskell.org/platform)
 
 
 When you have 'ghc' and 'cabal' or the Haskell Platform installed:
 
-* If you want the library AND the binary (the easier way):
-  ** run 'cabal install UTFTConverter'
-  ** the executable is now at '~/.cabal/bin/UTFTConverter'
+'''If you want the library AND the binary (the easier way):'''
+  * run 'cabal install UTFTConverter'
+  * the executable is now at '~/.cabal/bin/UTFTConverter'
 
-*If you want only the cmd tool:
-  ** download the JuicyPixels library - 'cabal install JuicyPixels',
-  ** download the git repository - 'git clone http://github.com/cirquit/UTFTConverter'
-  ** run 'make' and the binary is in the same directory OR
-  ** run 'cabal install' and the binary is in '/dist/build/' and in your home directory under '~/.cabal/bin/UTFTConverter', you can also add '~/.cabal/bin' to your PATH variable, so you can start it from anywhere
+'''If you want only the cmd tool:'''
+  * download the JuicyPixels library - 'cabal install JuicyPixels',
+  * download the git repository - 'git clone http://github.com/cirquit/UTFTConverter'
+  * run 'make' and the binary is in the same directory OR
+  * run 'cabal install' and the binary is in '/dist/build/' and in your home directory under '~/.cabal/bin/UTFTConverter', you can also add '~/.cabal/bin' to your PATH variable, so you can start it from anywhere
 
 #### Working
 
