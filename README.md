@@ -44,7 +44,7 @@ When you have `ghc` and `cabal` or the Haskell Platform installed:
 #### Usage:
 
   ```
-  ./UTFTConverter <filespec> /c|r [/o <path>] [/t AVR|ARM|PIC32]\n
+  ./UTFTConverter <filespec> /c|r [/o <path>] [/t AVR|ARM|PIC32]
 
   <filespec>:  File(s) to convert
   parameters: /c            - Create output as .c array files
