@@ -4,6 +4,8 @@
 -- Module      :  Format.C
 -- License     :  MIT
 -- Maintainer  :  Alexander Isenko <alex.isenko@googlemail.com>
+--
+-- @Format.C@ exports the Platform datatype and the needed formatting for the @.c@ file
 -----------------------------------------------------------------------------
 
 module Format.C (toCFile, Platform(..)) where
@@ -43,7 +45,6 @@ data Platform = AVR
 --  \/\/ Time generated : 2015-09-01 19:56:40.438958 UTC
 --  \/\/ Image Size     : 4x4 pixels
 --  \/\/ Memory usage   : 32 bytes
---
 --
 -- #include \<avr/pgmspace.h\>
 -- const unsigned short example[16] PROGMEM={

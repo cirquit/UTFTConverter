@@ -1,11 +1,40 @@
 {-# LANGUAGE BangPatterns #-}
+
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Format.RGB565
+-- License     :  MIT
+-- Maintainer  :  Alexander Isenko <alex.isenko@googlemail.com>
+--
+-- @Format.RGB565@ exports the functions to convert from a RGB value to RGB565 and the needed hex conversions
+--
+-----------------------------------------------------------------------------
 module Format.RGB565 (toRGB565, toRGB565Hex, to6Hex, to4Hex, toHex) where
 
 import Data.Bits (shiftL, shiftR, (.|.))
 import Data.Word (Word8())
 
+
+-- | toRGB565Hex takes a RGB value and converts it into a RGB565 encoded 4 digit hex String
+--
+-- __Example usage:__
+--
+-- @
+-- λ> toRGB565Hex (255, 0, 0)
+-- \"F800\"
+-- @
+
 toRGB565Hex :: (Word8, Word8, Word8) -> String
 toRGB565Hex rgb = to4Hex (toRGB565 rgb)
+
+-- | toRGB565 takes a RGB value and converts it into a RGB565 encoded Int
+--
+-- __Example usage:__
+--
+-- @
+-- λ> toRGB565 (255, 0, 0)
+-- 63488
+-- @
 
 toRGB565 :: (Word8, Word8, Word8) -> Int
 toRGB565 (r, g, b) = r' .|. g' .|. b'
@@ -16,6 +45,14 @@ toRGB565 (r, g, b) = r' .|. g' .|. b'
 toInt :: Word8 -> Int
 toInt = fromIntegral
 
+-- | toHex takes an Int and converts it into a hex String
+--
+-- __Example usage:__
+--
+-- @
+-- λ> toHex 255
+-- \"F8\"
+-- @
 toHex :: Int -> String
 toHex = go ""
   where go !acc x =
@@ -23,6 +60,14 @@ toHex = go ""
             (0,r) ->     hex r : acc
             (q,r) -> go (hex r : acc) q
 
+-- | to4Hex takes an Int and converts it to a hex String and adds zeros until four digits are filled
+--
+-- __Example usage:__
+--
+-- @
+-- λ> to4Hex 255
+-- "00F8"
+-- @
 to4Hex :: Int -> String
 to4Hex x = go hx
   where hx = toHex x
@@ -31,6 +76,14 @@ to4Hex x = go hx
           | length str < 4 = go ('0':str)
           | otherwise      = str
 
+-- | to6Hex takes an Int and converts it to a hex String and adds zeros until six digits are filled
+--
+-- __Example usage:__
+--
+-- @
+-- λ> to4Hex 255
+-- "0000F8"
+-- @
 to6Hex :: Int -> String
 to6Hex x = go hx
   where hx = toHex x

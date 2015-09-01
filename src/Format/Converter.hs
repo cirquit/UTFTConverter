@@ -1,4 +1,26 @@
 {-# LANGUAGE TypeSynonymInstances #-}
+
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Format.Converter
+-- License     :  MIT
+-- Maintainer  :  Alexander Isenko <alex.isenko@googlemail.com>
+--
+-- @Format.Converter@ exports the functions that create the @.c@ or @.raw@ files when the @FilePath@ is given
+--
+-- Both @pictureToRaw@ and @pictureToC@ accept these picture formats
+--
+-- * @.gif@
+-- * @.png@
+-- * @.jpg \/\ .jpe \/\ .jpeg@
+-- * @.bmp@
+-- * @.tga@
+--
+-- If it's not any of those formats, an error gets thrown
+-- If there is an error while decoding the pictures it gets printed out
+
+-----------------------------------------------------------------------------
+
 module Format.Converter (pictureToRaw, pictureToC) where
 
 import qualified Data.ByteString as BS (readFile)
@@ -19,6 +41,35 @@ import Format.RGB565                   (toRGB565Hex)
 import Format.C                        (toCFile, Platform())
 import Format.Raw                      (toRawFile)
 
+-- | pictureToRaw takes a picture, decodes it, parses every pixel to a 4 digit RGB565 hex and saves it to
+--   a file with the same name and a @.raw@ extention in the specified directory
+--
+-- This function takes two arguments
+--
+-- * @FilePath@ is the directory to save the file to
+-- * @FilePath@ is the filepath to the picture
+--
+-- __Possible errors:__
+--
+-- * Can throw an error if the picture format is not supported
+-- * If there is an error while decoding the pictures the file gets skipped and an error message is printed out
+--
+-- __Results:__
+--
+-- If the conversion was successful, a message gets printed
+--
+-- @
+-- cat_01_bmp_120x120.bmp --> cat_01_bmp_120x120.raw
+-- @
+--
+-- __Example usage:__ (assumed that the picture is in the directory where ghci was started)
+--
+-- @
+-- λ> dir <- getCurrentDirectory
+-- λ> pictureToRaw dir "cat_01_bmp_120x120.bmp"
+-- cat_01_bmp_120x120.bmp --> cat_01_bmp_120x120.raw
+-- @
+
 pictureToRaw :: FilePath -> FilePath -> IO ()
 pictureToRaw saveTo fp = do
   case takeExtension fp of
@@ -30,6 +81,38 @@ pictureToRaw saveTo fp = do
     (".gif")  -> gifToDynImg fp >>= dynimgToRaw saveTo fp
     (".tga")  -> tgaToDynImg fp >>= dynimgToRaw saveTo fp
     (_)       -> error "Argument filter let through some unsupported types"
+
+
+-- | pictureToC takes a picture, decodes it, parses every pixel to a 4 digit RGB565 hex, adds the header
+--   based on the desired platform and saves it to a file with the same name and a @.c@ extention in the specified
+--   directory
+--
+-- This function takes three arguments
+--
+-- * @Platform@ is the desired platform to convert to
+-- * @FilePath@ is the directory to save the file to
+-- * @FilePath@ is the filepath to the picture
+--
+-- __Possible errors:__
+--
+-- * Can throw an error if the picture format is not supported
+-- * If there is an error while decoding the pictures the file gets skipped and an error message is printed out
+--
+-- __Results:__
+--
+-- If the conversion was successful, a message gets printed
+--
+-- @
+-- cat_01_bmp_120x120.bmp --> cat_01_bmp_120x120.c
+-- @
+--
+-- __Example usage:__ (assumed that the picture is in the directory where ghci was started)
+-- 
+-- @
+-- λ> dir <- getCurrentDirectory
+-- λ> pictureToC AVR dir "cat_01_bmp_120x120.bmp"
+-- cat_01_bmp_120x120.bmp --> cat_01_bmp_120x120.c
+-- @
 
 pictureToC :: Platform -> FilePath -> FilePath -> IO ()
 pictureToC platform saveTo fp = do
