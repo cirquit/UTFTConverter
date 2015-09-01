@@ -6,8 +6,6 @@ import System.Directory      (getCurrentDirectory, createDirectoryIfMissing,
 import System.Environment    (getArgs, getProgName)
 import System.Exit           (exitFailure)
 
-import Control.Applicative   (pure, (<$>), (<*>))
-
 import Format.Converter      (pictureToC, pictureToRaw)
 import Format.C              (Platform(..))
 

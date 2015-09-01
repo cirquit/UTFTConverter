@@ -1,5 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
-module Format.RGB565 (toRGB565, toRGB565Hex, to4Hex, toHex) where
+module Format.RGB565 (toRGB565, toRGB565Hex, to6Hex, to4Hex, toHex) where
 
 import Data.Bits (shiftL, shiftR, (.|.))
 import Data.Word (Word8())
@@ -30,6 +30,15 @@ to4Hex x = go hx
         go !str
           | length str < 4 = go ('0':str)
           | otherwise      = str
+
+to6Hex :: Int -> String
+to6Hex x = go hx
+  where hx = toHex x
+        go :: String -> String
+        go !str
+          | length str < 6 = go ('0':str)
+          | otherwise      = str
+
 
 
 hex :: Int -> Char
