@@ -46,8 +46,8 @@ import Format.Raw                      (toRawFile)
 --
 -- This function takes two arguments
 --
--- * @FilePath@ is the directory to save the file to
--- * @FilePath@ is the filepath to the picture
+-- * first @FilePath@ is the directory to save the file to
+-- * second @FilePath@ is the filepath to the picture
 --
 -- __Possible errors:__
 --
@@ -90,8 +90,8 @@ pictureToRaw saveTo fp = do
 -- This function takes three arguments
 --
 -- * @Platform@ is the desired platform to convert to
--- * @FilePath@ is the directory to save the file to
--- * @FilePath@ is the filepath to the picture
+-- * first @FilePath@ is the directory to save the file to
+-- * second @FilePath@ is the filepath to the picture
 --
 -- __Possible errors:__
 --
