@@ -66,6 +66,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
 
   * maybe add resizing with a basic linear algorithm
   * I'm planning to make a simple API that you can start locally which accepts any below defined formats and responses with the parsed `.raw` file. (another project)
+  * add `stack` support
 
 #### About:
 
