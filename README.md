@@ -38,7 +38,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
 
 ## Installation:
 
-1. Install the Glasgow Haskell Compiler and `cabal` OR the Haskell packaging tool
+Step 1: Install the Glasgow Haskell Compiler and `cabal` OR the Haskell packaging tool
 
 #### For Ubuntu distributions:
   * `sudo apt-get install ghc`
@@ -50,18 +50,17 @@ I will try to make the tool as identical as possible to the corresponding tool a
   * Follow the instructions for your operation system on [Haskell Platform](http://haskell.org/platform)
 
 
-2. When you have `ghc` and `cabal` or the Haskell Platform installed:
+Step 2: When you have `ghc` and `cabal` or the Haskell Platform installed:
 
 #### If you want the library AND the binary (the easier way):
   * run `cabal install UTFTConverter`
   * the executable is now at `~/.cabal/bin/UTFTConverter`
 
-#### If you want only the cmd tool:
+#### If you want to build it by hand:
   * download the JuicyPixels library - `cabal install JuicyPixels`
   * download the git repository - `git clone http://github.com/cirquit/UTFTConverter`
   * run `make` and the binary is in the same directory OR
   * run `cabal install` and the binary is in `/dist/build/` and in your home directory under `~/.cabal/bin/UTFTConverter`, you can also add `~/.cabal/bin` to your `PATH` variable, so you can start it from anywhere
-
 
 #### To do:
 
