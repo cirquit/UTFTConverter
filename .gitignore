@@ -1,5 +1,4 @@
 UTFTConverter
-bin
 dist
 cabal-dev
 *.o
