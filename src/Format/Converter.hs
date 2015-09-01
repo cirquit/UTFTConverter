@@ -107,7 +107,7 @@ pictureToRaw saveTo fp = do
 -- @
 --
 -- __Example usage:__ (assumed that the picture is in the directory where ghci was started)
--- 
+--
 -- @
 -- λ> dir <- getCurrentDirectory
 -- λ> pictureToC AVR dir "cat_01_bmp_120x120.bmp"

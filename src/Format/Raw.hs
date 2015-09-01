@@ -15,11 +15,11 @@ module Format.Raw (toRawFile) where
 --
 -- __Example usage:__
 --
---@
+-- @
 -- λ> let hex = ["0000", "0000", \"FF00\", "00FF","0000", "0000", \"FF00\", "00FF", "0000", "0000", \"FF00\", "00FF", "0000", "0000", \"FF00\", "00FF", "0000"]
 -- λ> toRawFile hex
 -- "0000 0000 FF00 00FF 0000 0000 FF00 00FF 0000 0000 FF00 00FF 0000 0000 FF00 00FF \\n 0000 "
---@
+-- @
 toRawFile :: [String] -> String
 toRawFile l = toRawArray l 1 []
   where toRawArray :: [String] -> Int -> String -> String
