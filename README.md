@@ -38,7 +38,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
 
 ## Installation:
 
-Step 1: Install the Glasgow Haskell Compiler and `cabal` OR the Haskell packaging tool
+**Step 1**: Install the Glasgow Haskell Compiler and `cabal` OR the Haskell packaging tool
 
 #### For Ubuntu distributions:
   * `sudo apt-get install ghc`
@@ -50,7 +50,7 @@ Step 1: Install the Glasgow Haskell Compiler and `cabal` OR the Haskell packagin
   * Follow the instructions for your operation system on [Haskell Platform](http://haskell.org/platform)
 
 
-Step 2: When you have `ghc` and `cabal` or the Haskell Platform installed:
+**Step 2**: When you have `ghc` and `cabal` or the Haskell Platform installed:
 
 #### If you want the library AND the binary (the easier way):
   * run `cabal install UTFTConverter`
