@@ -12,6 +12,10 @@ import Data.List                       (foldl')
 main :: IO ()
 main = do
   dir <- getCurrentDirectory
+  exist <- doesDirectoryExist "tmp"
+  if exist
+    then removeDirectoryRecursive "tmp"
+    else return ()
   hspec $ do
     describe "UTFTConverter Library" $ do
       describe "Format.RGB565"    $ do

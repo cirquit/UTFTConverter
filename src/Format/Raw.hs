@@ -21,10 +21,10 @@ module Format.Raw (toRawFile) where
 -- "0000 0000 FF00 00FF 0000 0000 FF00 00FF 0000 0000 FF00 00FF 0000 0000 FF00 00FF \\n 0000 "
 -- @
 toRawFile :: [String] -> String
-toRawFile l = toRawArray l 1 []
-  where toRawArray :: [String] -> Int -> String -> String
-        toRawArray []     _  acc = acc
-        toRawArray (x:xs) n !acc = toRawArray xs (n + 1) (acc ++ x ++ nl)
+toRawFile l = toRawArray l 1
+  where toRawArray :: [String] -> Int -> String
+        toRawArray []     _ = []
+        toRawArray (x:xs) n = x ++ nl ++ toRawArray xs (n + 1)
            where nl
                   | n `mod` 16 == 0 = "\n"
                   | otherwise       = " "
