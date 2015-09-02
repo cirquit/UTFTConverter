@@ -52,7 +52,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
 
 **Step 2**: When you have `ghc` and `cabal` OR the Haskell Platform installed:
 
-#### If you want the library AND the binary (the easier way):
+#### If you want the library AND the binary (the easier way) (still to be uploaded on hackage):
   * run `cabal install UTFTConverter`
   * the executable is now at `~/.cabal/bin/UTFTConverter`
 
