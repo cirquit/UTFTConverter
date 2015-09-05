@@ -60,7 +60,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
   * download the JuicyPixels library - `cabal install JuicyPixels`
   * download the git repository - `git clone http://github.com/cirquit/UTFTConverter`
   * run `make` and the binary is in the same directory OR
-  * run `cabal install` and the binary is in `/dist/build/` and in your home directory under `~/.cabal/bin/UTFTConverter`, you can also add `~/.cabal/bin` to your `PATH` variable, so you can start it from anywhere
+  * run `cabal install` and the binary is in `/dist/build/` and in your home directory under `~/.cabal/bin/UTFTConverter`
 
 #### To do:
 
