@@ -34,7 +34,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
 ## Binaries
 
   * precompiled binary for Ubuntu distributions in `bin/UTFTConverter_u` (compiled on Linux Mint 17)
-  * precompiled binary for Windows in `bin/UTFTConverter_w.exe` (compiled on Windows 7) (TODO)
+  * precompiled binary for Windows in `bin/UTFTConverter_w.exe` (compiled on Windows 7)
 
 ## Installation:
 
@@ -52,7 +52,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
 
 **Step 2**: When you have `ghc` and `cabal` OR the Haskell Platform installed:
 
-#### If you want the library AND the binary (the easier way) (still to be uploaded on hackage):
+#### If you want the library AND the binary (the easier way):
   * run `cabal install UTFTConverter`
   * the executable is now at `~/.cabal/bin/UTFTConverter`
 

@@ -16,8 +16,7 @@
 -- * @.bmp@
 -- * @.tga@
 --
--- If it's not any of those formats, an error gets thrown
--- If there is an error while decoding the pictures it gets printed out
+-- If it's not any of those formats, an error gets thrown and if there is an error while decoding the pictures it only gets printed out (it gets skipped)
 
 -----------------------------------------------------------------------------
 
