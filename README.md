@@ -36,7 +36,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
   * precompiled binary for Ubuntu distributions in `bin/UTFTConverter_u` (compiled on Linux Mint 17)
   * precompiled binary for Windows in `bin/UTFTConverter_w.exe` (compiled on Windows 7)
 
-## Installation:
+## Installation via cabal:
 
 **Step 1**: Install the Glasgow Haskell Compiler and `cabal` OR the Haskell packaging tool
 
@@ -62,11 +62,18 @@ I will try to make the tool as identical as possible to the corresponding tool a
   * run `make` and the binary is in the same directory OR
   * run `cabal install` and the binary is in `/dist/build/` and in your home directory under `~/.cabal/bin/UTFTConverter`
 
+## Installation via stack:
+
+ * Install stack [*nix](https://github.com/commercialhaskell/stack/blob/master/doc/GUIDE.md) / [Windows](https://github.com/cirquit/ffp-lib)
+ * open your shell and type `stack setup`
+ * after that `stack install UTFTConverter`
+ * look up the messages where your executable lies
+
+
 #### To do:
 
   * maybe add resizing with a basic linear algorithm
   * I'm planning to make a simple API that you can start locally which accepts any below defined formats and responses with the parsed `.raw` file. (another project)
-  * add `stack` support
 
 #### About:
 
