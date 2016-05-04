@@ -1,12 +1,13 @@
 module Main where
 
-import Format.RGB565                   (toHex, to4Hex, toRGB565, toRGB565Hex)
-import Format.Converter                (pictureToRaw)
+import Format.RGB565                   (toHex, toNHex, toRGB565, toRGB565Hex)
+import Format.Converter                (pictureToRaw, toMaybeFormat, Format())
 import Test.Hspec
 import System.Directory                (getCurrentDirectory, doesDirectoryExist,
                                         createDirectory, getDirectoryContents,
                                         removeDirectoryRecursive)
 import System.FilePath.Posix           ((</>))
+import Data.Maybe                      (fromJust)
 import Data.List                       (foldl')
 
 main :: IO ()
@@ -33,19 +34,19 @@ main = do
           it "toHex should be 10000" $ do
             toHex 65536 `shouldBe` "10000"
 
-        describe "to4Hex" $ do
-          it "to4Hex 0 should be 0000" $ do
-            to4Hex 0     `shouldBe` "0000"
-          it "to4Hex 12 should be 000C" $ do
-            to4Hex 12    `shouldBe` "000C"
-          it "to4Hex 198 should be 00C6" $ do
-            to4Hex 198   `shouldBe` "00C6"
-          it "to4Hex 122 should be 007A" $ do
-            to4Hex 122   `shouldBe` "007A"
-          it "to4Hex 255 should be 00FF" $ do
-            to4Hex 255   `shouldBe` "00FF"
-          it "to4Hex 65535 should be FFFF" $ do
-            to4Hex 65535 `shouldBe` "FFFF"
+        describe "toNHex" $ do
+          it "toNHex 4 0 should be 0000" $ do
+            toNHex 4 0     `shouldBe` "0000"
+          it "toNHex 4 12 should be 000C" $ do
+            toNHex 4 12    `shouldBe` "000C"
+          it "toNHex 4 198 should be 00C6" $ do
+            toNHex 4 198   `shouldBe` "00C6"
+          it "toNHex 4 122 should be 007A" $ do
+            toNHex 4 122   `shouldBe` "007A"
+          it "toNHex 4 255 should be 00FF" $ do
+            toNHex 4 255   `shouldBe` "00FF"
+          it "toNHex 4 65535 should be FFFF" $ do
+            toNHex 4 65535 `shouldBe` "FFFF"
 
         describe "toRGB565" $ do
           it "toRGB565 (255, 255, 255) should be 65535" $ do
@@ -84,7 +85,7 @@ main = do
           length (dir1 ++ dir2 ++ dir3) `shouldBe` 15
         it "cat_01 pics should be all converted to almost the same .raw-files (>99% similarity)" $ do
           createDirectory "tmp"
-          pics <- getExamplePicsPath dir ("tests" </> "examples" </> "cat_01")
+          pics <- getExampleFormatPicsPath dir ("tests" </> "examples" </> "cat_01")
           mapM_ (pictureToRaw (dir </> "tmp")) pics
           rawfps <- getExamplePicsPath dir "tmp"
           [p1, p2, p3, p4, p5] <- mapM readFile rawfps
@@ -100,7 +101,7 @@ main = do
           ((r1 + r2 + r3 + r4) / 4) > 98 `shouldBe` True
         it "cat_02 pics should be all converted to almost the same .raw-files (>99% similarity)" $ do
           createDirectory "tmp"
-          pics <- getExamplePicsPath dir ("tests" </> "examples" </> "cat_02")
+          pics <- getExampleFormatPicsPath dir ("tests" </> "examples" </> "cat_02")
           mapM_ (pictureToRaw (dir </> "tmp")) pics
           rawfps <- getExamplePicsPath dir "tmp"
           [p1, p2, p3, p4, p5] <- mapM readFile rawfps
@@ -116,7 +117,7 @@ main = do
           ((r1 + r2 + r3 + r4) / 4) > 98 `shouldBe` True
         it "cat_03 pics should be all converted to almost the same .raw-files (>99% similarity)" $ do
           createDirectory "tmp"
-          pics <- getExamplePicsPath dir ("tests" </> "examples" </> "cat_03")
+          pics <- getExampleFormatPicsPath dir ("tests" </> "examples" </> "cat_03")
           mapM_ (pictureToRaw (dir </> "tmp")) pics
           rawfps <- getExamplePicsPath dir "tmp"
           [p1, p2, p3, p4, p5] <- mapM readFile rawfps
@@ -131,12 +132,18 @@ main = do
           removeDirectoryRecursive (dir </> "tmp")
           ((r1 + r2 + r3 + r4) / 4) > 98 `shouldBe` True
 
-
 getExamplePicsPath :: FilePath -> FilePath -> IO [FilePath]
 getExamplePicsPath curdir picdir = do
   content <- getDirectoryContents (curdir </> picdir)
   let picnames = filter (`notElem` [".", ".."]) content
   return $ map (\x -> curdir </> picdir </> x) picnames
+
+getExampleFormatPicsPath :: FilePath -> FilePath -> IO [(Format, FilePath)]
+getExampleFormatPicsPath curdir picdir = do
+  content <- getDirectoryContents (curdir </> picdir)
+  let picnames = filter (`notElem` [".", ".."]) content
+      picpaths = map (\x -> curdir </> picdir </> x) picnames
+  flip zip picpaths . map fromJust <$> mapM toMaybeFormat picpaths
 
 picSimilarity :: String -> String -> Double
 picSimilarity p1 p2 =

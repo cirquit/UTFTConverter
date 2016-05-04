@@ -9,10 +9,12 @@
 -- @Format.RGB565@ exports the functions to convert from a RGB value to RGB565 and the needed hex conversions
 --
 -----------------------------------------------------------------------------
-module Format.RGB565 (toRGB565, toRGB565Hex, to6Hex, to4Hex, toHex) where
+module Format.RGB565 (toRGB565, toRGB565Hex, toNHex, to6Hex, to4Hex, toHex) where
 
 import Data.Bits (shiftL, shiftR, (.|.))
 import Data.Word (Word8())
+import Numeric   (showHex)
+import Data.Char (toUpper)
 
 
 -- | toRGB565Hex takes a RGB value and converts it into a RGB565 encoded 4 digit hex String
@@ -25,7 +27,7 @@ import Data.Word (Word8())
 -- @
 
 toRGB565Hex :: (Word8, Word8, Word8) -> String
-toRGB565Hex rgb = to4Hex (toRGB565 rgb)
+toRGB565Hex rgb = toNHex 4 (toRGB565 rgb)
 
 -- | toRGB565 takes a RGB value and converts it into a RGB565 encoded Int
 --
@@ -45,70 +47,67 @@ toRGB565 (r, g, b) = r' .|. g' .|. b'
 toInt :: Word8 -> Int
 toInt = fromIntegral
 
--- | toHex takes an Int and converts it into a hex String
+-- | toHex takes an unsigned Int and converts it into a hex String
 --
 -- __Example usage:__
 --
 -- @
 -- λ> toHex 255
--- \"F8\"
+-- \"FF\"
 -- @
 toHex :: Int -> String
-toHex = go ""
-  where go !acc x =
-          case quotRem x 16 of
-            (0,r) ->     hex r : acc
-            (q,r) -> go (hex r : acc) q
+toHex = map toUpper . flip showHex ""
 
--- | to4Hex takes an Int and converts it to a hex String and adds zeros until four digits are filled
+-- | toNHex takes the desired stringlength __n__ and an unsigned Int and converts it to a hex String and adds zeros until __n__ digits are filled
 --
 -- __Example usage:__
 --
 -- @
--- λ> to4Hex 255
--- "00F8"
+-- λ> toNHex 4 255
+-- "00FF"
+--
+-- λ> toNHex 6 255
+-- "0000FF"
 -- @
-to4Hex :: Int -> String
-to4Hex x = go hx
+toNHex :: Int -> Int -> String
+toNHex n x = map toUpper $ go hx
   where hx = toHex x
         go :: String -> String
         go !str
-          | length str < 4 = go ('0':str)
+          | length str < n = go ('0':str)
           | otherwise      = str
 
--- | to6Hex takes an Int and converts it to a hex String and adds zeros until six digits are filled
+
+-- | to4Hex takes an unsigned Int and converts it to a hex String and adds zeros until four digits are filled
 --
 -- __Example usage:__
 --
 -- @
 -- λ> to4Hex 255
--- "0000F8"
+-- "00FF"
 -- @
-to6Hex :: Int -> String
-to6Hex x = go hx
+{-# DEPRECATED to4Hex "Use toNHex 4 instead" #-}
+to4Hex :: Int -> String
+to4Hex x = map toUpper $ go hx
   where hx = toHex x
         go :: String -> String
         go !str
           | length str < 6 = go ('0':str)
           | otherwise      = str
 
-
-
-hex :: Int -> Char
-hex 0  = '0'
-hex 1  = '1'
-hex 2  = '2'
-hex 3  = '3'
-hex 4  = '4'
-hex 5  = '5'
-hex 6  = '6'
-hex 7  = '7'
-hex 8  = '8'
-hex 9  = '9'
-hex 10 = 'A'
-hex 11 = 'B'
-hex 12 = 'C'
-hex 13 = 'D'
-hex 14 = 'E'
-hex 15 = 'F'
-hex x  = error $ "Exceeded bounds of 'hex' - " ++ show x
+-- | to4Hex takes an unsigned Int and converts it to a hex String and adds zeros until six digits are filled
+--
+-- __Example usage:__
+--
+-- @
+-- λ> to6Hex 255
+-- "0000FF"
+-- @
+{-# DEPRECATED to6Hex "Use toNHex 6 instead" #-}
+to6Hex :: Int -> String
+to6Hex x = map toUpper $ go hx
+  where hx = toHex x
+        go :: String -> String
+        go !str
+          | length str < 6 = go ('0':str)
+          | otherwise      = str

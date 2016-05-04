@@ -20,13 +20,14 @@
 
 -----------------------------------------------------------------------------
 
-module Format.Converter (pictureToRaw, pictureToC) where
+module Format.Converter (pictureToRaw, pictureToC, toMaybeFormat, Format(..)) where
 
 import qualified Data.ByteString as BS (readFile)
 import Data.ByteString.Lazy            (toStrict)
 import System.FilePath.Posix           (takeBaseName, (</>),
                                         takeExtension, takeFileName)
 import Data.Time                       (getCurrentTime)
+import Data.Char                       (toUpper)
 
 import Codec.Picture.Types
 import Codec.Picture.Saving            (imageToBitmap)
@@ -36,9 +37,86 @@ import Codec.Picture.Png               (decodePng)
 import Codec.Picture.Gif               (decodeGif)
 import Codec.Picture.Tga               (decodeTga)
 
+import Codec.ImageType                 (getFileType)
+
 import Format.RGB565                   (toRGB565Hex)
 import Format.C                        (toCFile, Platform())
 import Format.Raw                      (toRawFile)
+
+-- | Currently supported picture formats (by JuicyPixels)
+--
+data Format = Jpeg
+            | Bmp
+            | Png
+            | Gif
+            | Tga
+
+instance Show Format where
+    show Jpeg = "jpeg"
+    show Bmp  = "bmp"
+    show Png  = "png"
+    show Gif  = "gif"
+    show Tga  = "tga"
+
+instance Read Format where
+    readsPrec _ e = do
+        (s,r) <- lex e
+        case map toUpper s of
+            "JPEG" -> return (Jpeg, r)
+            "JPG"  -> return (Jpeg, r)
+            "JPE"  -> return (Jpeg, r)
+            "GIF"  -> return (Gif, r)
+            "BMP"  -> return (Bmp, r)
+            "PNG"  -> return (Png, r)
+            "TGA"  -> return (Tga, r)
+            _      -> fail "Read Format: no parse"
+
+-- | Checking if the format is supported via magic bytes
+--   safe checking for everything unless __.tga__
+--
+--  __Possible errors:__
+--  
+--  * It will be problematic in the future if you try to read the file as .tga if it's not encoded as one
+--
+--  __Example usage:__
+--
+--  @
+--  λ> toMaybeFormat "cat_01_bmp_120x120.bmp"
+--  Just Bmp
+--  λ> toMaybeFormat "cat_01_bmp_120x120.jpeg"
+--  Just Jpeg
+--  λ> toMaybeFormat "cat_01_bmp_120x120.jpe"
+--  Just Jpeg
+--  @
+
+toMaybeFormat :: FilePath -> IO (Maybe Format)
+toMaybeFormat fp = do
+    mtp <- getFileType fp
+    let ext = drop 1 $ takeExtension fp
+        validFormats = map show [Jpeg, Bmp, Png, Gif, Tga]
+    case (mtp, ext) of
+      (Just "jpeg", _)
+          | ext `elem` ["jpg", "jpeg", "jpe"] -> return $ Just Jpeg
+      (Just tp, _)
+          | tp `elem` validFormats, tp == ext -> return $ Just $ read tp
+          | tp `elem` validFormats            -> do
+                putStrLn $ "WARNING: File format is " ++ '.':tp ++ ", not " ++ '.':ext ++ " ~ " ++ fp
+                return $ Just $ read fp
+      (_, _)
+          | "tga" <- ext                      -> return $ Just Tga
+          | otherwise                         -> return Nothing
+
+
+formatToDynImg :: Format -> FilePath -> IO (Maybe DynamicImage)
+formatToDynImg f fp = do
+    case f of
+        Jpeg -> jpgToDynImg fp
+        Bmp  -> bmpToDynImg fp
+        Png  -> pngToDynImg fp
+        Gif  -> gifToDynImg fp
+        Tga  -> tgaToDynImg fp
+--      ft@_    -> error $ "Converter.hs: formatToDynImg:91 - Unsupported Format - " ++ show ft
+
 
 -- | pictureToRaw takes a picture, decodes it, parses every pixel to a 4 digit RGB565 hex and saves it to
 --   a file with the same name and a @.raw@ extention in the specified directory
@@ -46,7 +124,7 @@ import Format.Raw                      (toRawFile)
 -- This function takes two arguments
 --
 -- * first @FilePath@ is the directory to save the file to
--- * second @FilePath@ is the filepath to the picture
+-- * second @(Format, FilePath)@ is the format and filepath of the picture
 --
 -- __Possible errors:__
 --
@@ -65,22 +143,12 @@ import Format.Raw                      (toRawFile)
 --
 -- @
 -- λ> dir <- getCurrentDirectory
--- λ> pictureToRaw dir "cat_01_bmp_120x120.bmp"
+-- λ> pictureToRaw dir (Bmp, "cat_01_bmp_120x120.bmp")
 -- cat_01_bmp_120x120.bmp --> cat_01_bmp_120x120.raw
 -- @
 
-pictureToRaw :: FilePath -> FilePath -> IO ()
-pictureToRaw saveTo fp = do
-  case takeExtension fp of
-    (".jpg")  -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
-    (".jpeg") -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
-    (".jpe")  -> jpgToDynImg fp >>= dynimgToRaw saveTo fp
-    (".bmp")  -> bmpToDynImg fp >>= dynimgToRaw saveTo fp
-    (".png")  -> pngToDynImg fp >>= dynimgToRaw saveTo fp
-    (".gif")  -> gifToDynImg fp >>= dynimgToRaw saveTo fp
-    (".tga")  -> tgaToDynImg fp >>= dynimgToRaw saveTo fp
-    (_)       -> error "Argument filter let through some unsupported types"
-
+pictureToRaw :: FilePath -> (Format, FilePath) -> IO ()
+pictureToRaw saveTo (format,fp) = formatToDynImg format fp >>= dynimgToRaw saveTo fp
 
 -- | pictureToC takes a picture, decodes it, parses every pixel to a 4 digit RGB565 hex, adds the header
 --   based on the desired platform and saves it to a file with the same name and a @.c@ extention in the specified
@@ -90,7 +158,7 @@ pictureToRaw saveTo fp = do
 --
 -- * @Platform@ is the desired platform to convert to
 -- * first @FilePath@ is the directory to save the file to
--- * second @FilePath@ is the filepath to the picture
+-- * second @(Format, FilePath)@ is the format and filepath of the picture
 --
 -- __Possible errors:__
 --
@@ -109,21 +177,12 @@ pictureToRaw saveTo fp = do
 --
 -- @
 -- λ> dir <- getCurrentDirectory
--- λ> pictureToC AVR dir "cat_01_bmp_120x120.bmp"
+-- λ> pictureToC AVR dir (Bmp, "cat_01_bmp_120x120.bmp")
 -- cat_01_bmp_120x120.bmp --> cat_01_bmp_120x120.c
 -- @
 
-pictureToC :: Platform -> FilePath -> FilePath -> IO ()
-pictureToC platform saveTo fp = do
-  case takeExtension fp of
-    (".jpg")  -> jpgToDynImg fp >>= dynimgToC platform saveTo fp
-    (".jpeg") -> jpgToDynImg fp >>= dynimgToC platform saveTo fp
-    (".jpe")  -> jpgToDynImg fp >>= dynimgToC platform saveTo fp
-    (".bmp")  -> bmpToDynImg fp >>= dynimgToC platform saveTo fp
-    (".png")  -> pngToDynImg fp >>= dynimgToC platform saveTo fp
-    (".gif")  -> gifToDynImg fp >>= dynimgToC platform saveTo fp
-    (".tga")  -> tgaToDynImg fp >>= dynimgToC platform saveTo fp
-    (_)       -> error "Argument filter let through some unsupported types"
+pictureToC :: Platform -> FilePath -> (Format, FilePath) -> IO ()
+pictureToC platform saveTo (format,fp) = formatToDynImg format fp >>= dynimgToC platform saveTo fp
 
 jpgToDynImg :: FilePath -> IO (Maybe DynamicImage)
 jpgToDynImg fp = do

@@ -6,7 +6,7 @@ import System.Directory      (getCurrentDirectory, createDirectoryIfMissing,
 import System.Environment    (getArgs, getProgName)
 import System.Exit           (exitFailure)
 
-import Format.Converter      (pictureToC, pictureToRaw)
+import Format.Converter      (pictureToC, pictureToRaw, toMaybeFormat, Format(..))
 import Format.C              (Platform(..))
 
 type Args = [String]
@@ -14,11 +14,11 @@ type Args = [String]
 data FileType = C | Raw
 
 data Option = Option
- { outdir   :: FilePath
- , platform :: Platform
- , filetype :: Maybe FileType
- , files    :: [FilePath]
- }
+  { outdir   :: FilePath
+  , platform :: Platform
+  , filetype :: Maybe FileType
+  , files    :: [(Format, FilePath)]
+  }
 
 
 main :: IO ()
@@ -78,41 +78,39 @@ argsParser ("/o"        :xs) opt = do
 -- files parser
 argsParser (fp           :xs) opt = do
   exists <- doesFileExist fp
-  case (exists, takeExtension fp) of
-    (True, ".jpg")  -> argsParser xs (opt { files = fp : files opt})
-    (True, ".jpeg") -> argsParser xs (opt { files = fp : files opt})
-    (True, ".jpe")  -> argsParser xs (opt { files = fp : files opt})
-    (True, ".bmp")  -> argsParser xs (opt { files = fp : files opt})
-    (True, ".png")  -> argsParser xs (opt { files = fp : files opt})
-    (True, ".gif")  -> argsParser xs (opt { files = fp : files opt})
-    (True, ".tga")  -> argsParser xs (opt { files = fp : files opt})
-    (True,      _)  -> putStrLn ("WARNING: This format is not supported ~ " ++ fp) >> argsParser xs opt
-    (False,     _)  -> putStrLn ("WARNING: Unreconized flag ~ "    ++ fp) >> argsParser xs opt
+  mext   <- toMaybeFormat fp
+  case (exists, mext) of
+    (True, Just ext) -> argsParser xs (opt { files = (ext, fp) : files opt })
+    (True,  Nothing) -> putStrLn ("WARNING: This format is not supported ~ " ++ fp) >> argsParser xs opt
+    (False,       _) -> putStrLn ("WARNING: Unreconized flag ~ "    ++ fp) >> argsParser xs opt
 
 printOpt :: (FilePath, Platform, FileType) -> IO ()
 printOpt (outdir', platform', C)   = do
-  putStrLn $ "Converting to     : .c array file(s)"
-  putStrLn $ "Target platform   : " ++ show platform'
-  putStrLn $ "Output directory  : " ++ outdir'        ++ "\n"
-  putStrLn   "Processing file(s):"
+  putStrLn $ unlines [ "Converting to     : .c array file(s)"
+                     , "Target platform   : " ++ show platform'
+                     , "Output directory  : " ++ outdir'        ++ "\n"
+                     , "Processing file(s):"
+                     ]
 printOpt (outdir',        _, Raw) = do
-  putStrLn $ "Converting to     : .raw file(s)"
-  putStrLn $ "Output directory  : " ++ outdir'        ++ "\n"
-  putStrLn   "Processing file(s):"
+  putStrLn $ unlines [ "Converting to     : .raw file(s)"
+                     , "Output directory  : " ++ outdir'        ++ "\n"
+                     , "Processing file(s):"
+                     ]
 
 help :: IO ()
 help = do
   name <- getProgName
-  putStrLn   "\nUsage:                                           "
-  putStrLn $ "      " ++ name ++ " <filespec> /c|r [/o <path>] [/t AVR|ARM|PIC32]\n"
-  putStrLn   "<filespec>:  File(s) to convert"
-  putStrLn   "parameters: /c            - Create output as .c array files"
-  putStrLn   "            /r            - Create output as .raw files"
-  putStrLn   "            /o <path>     - Set the output directory to <path>\n"
-  putStrLn   "            /t <platform> - Select target plaform"
-  putStrLn   "                            AVR   : Most Arduinos, Bobuion"
-  putStrLn   "                            ARM   : Arduino Due, Teensy, TI CC3200 LaunchPad"
-  putStrLn   "                            PIC32 : All chipKit boards\n"
-  putStrLn   "You must specify either /c or /r. All other parameters are optional."
-  putStrLn   "If /o is ommited the current directory will be used for output."
-  putStrLn   "If /t is ommited the target platform will be set to AVR."
+  putStrLn $ unlines [ "\nUsage:                                           "
+                     , "      " ++ name ++ " <filespec> /c|r [/o <path>] [/t AVR|ARM|PIC32]\n"
+                     , "<filespec>:  File(s) to convert"
+                     , "parameters: /c            - Create output as .c array files"
+                     , "            /r            - Create output as .raw files"
+                     , "            /o <path>     - Set the output directory to <path>\n"
+                     , "            /t <platform> - Select target plaform"
+                     , "                            AVR   : Most Arduinos, Bobuion"
+                     , "                            ARM   : Arduino Due, Teensy, TI CC3200 LaunchPad"
+                     , "                            PIC32 : All chipKit boards\n"
+                     , "You must specify either /c or /r. All other parameters are optional."
+                     , "If /o is ommited the current directory will be used for output."
+                     , "If /t is ommited the target platform will be set to AVR."
+                     ]

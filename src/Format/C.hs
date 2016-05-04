@@ -11,7 +11,7 @@
 module Format.C (toCFile, Platform(..)) where
 
 import Data.Time        (UTCTime)
-import Format.RGB565    (to4Hex)
+import Format.RGB565    (toNHex)
 
 
 -- | The Platform datatype has three constructors, for every supported architecture
@@ -26,9 +26,9 @@ data Platform = AVR
 --
 -- * @[String]@ are the hex strings
 -- * @(String, String)@ is the (filename, file extention)
--- * @(Int, Int) is the (width, height)
--- * UTCTime is the current time
--- * Platform is the desired platform to convert to
+-- * @(Int, Int)@ is the (width, height)
+-- * @UTCTime@ is the current time
+-- * @Platform@ is the desired platform to convert to
 --
 -- The result is a the string which is the full c file with header + unsigned short array + comments
 --
@@ -81,4 +81,4 @@ printHex :: String -> String
 printHex hx = '0':'x': hx ++ ", "
 
 printCom :: Int -> String
-printCom n = ' ':' ':'/':'/':' ':'0':'x': to4Hex n ++ ' ':'(': show n ++ ") pixels\n"
+printCom n = ' ':' ':'/':'/':' ':'0':'x': toNHex 4 n ++ ' ':'(': show n ++ ") pixels\n"

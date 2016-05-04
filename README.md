@@ -30,6 +30,7 @@ I will try to make the tool as identical as possible to the corresponding tool a
   * If you specify a non-existing directory as target, it will be created
   * The length of the array is NOT preceded by `0x`
   * You can use the flags in any order you want
+  * This tool will check the files via magic bytes
 
 ## Binaries
 
@@ -57,18 +58,19 @@ I will try to make the tool as identical as possible to the corresponding tool a
   * the executable is now at `~/.cabal/bin/UTFTConverter`
 
 #### If you want to build it by hand:
-  * download the JuicyPixels library - `cabal install JuicyPixels`
+  * download the JuicyPixels library - `cabal install JuicyPixels` | `stack install 
   * download the git repository - `git clone http://github.com/cirquit/UTFTConverter`
   * run `make` and the binary is in the same directory OR
-  * run `cabal install` and the binary is in `/dist/build/` and in your home directory under `~/.cabal/bin/UTFTConverter`
+  * run `cabal install` and the binary is in `/dist/build/` and in your home directory under `~/.cabal/bin/UTFTConverter` OR
+  * run `stack build && stack install` and the binary is somewhere in your `.stack-work/`
+
 
 ## Installation via stack:
 
- * Install stack [*nix](https://github.com/commercialhaskell/stack/blob/master/doc/GUIDE.md) / [Windows](https://github.com/cirquit/ffp-lib)
+ * Install stack [Official guide](https://github.com/commercialhaskell/stack/blob/master/doc/GUIDE.md) / [My simplified guide](https://github.com/cirquit/ffp-lib)
  * open your shell and type `stack setup`
  * after that `stack install UTFTConverter`
  * look up the messages where your executable lies
-
 
 #### To do:
 
